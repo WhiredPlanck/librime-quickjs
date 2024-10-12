@@ -14,13 +14,13 @@ static void rime_quickjs_initialize() {
   LOG(INFO) << "registering components from module 'quickjs'.";
   Registry &r = Registry::instance();
 
-  static an<qjs::Runtime> rt(new qjs::Runtime);
+  an<qjs::Runtime> rt(new qjs::Runtime);
   an<qjs::Context> ctx = New<qjs::Context>(*rt);
 
   JSRegistry::Register("RimeQuickJS", ctx);
 
-  r.Register("qjs_processor", new QuickJSComponent<QuickJSProcessor>(ctx));
-  r.Register("qjs_translator", new QuickJSComponent<QuickJSTranslator>(ctx));
+  r.Register("qjs_processor", new QuickJSComponent<QuickJSProcessor>(rt, ctx));
+  r.Register("qjs_translator", new QuickJSComponent<QuickJSTranslator>(rt, ctx));
 }
 
 static void rime_quickjs_finalize() {

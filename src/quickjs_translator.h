@@ -8,11 +8,12 @@ namespace rime {
 
 class QuickJSTranslator : public Translator {
 public:
-    QuickJSTranslator(const Ticket& ticket, an<qjs::Context> ctx);
+    QuickJSTranslator(const Ticket& ticket, an<qjs::Runtime> rt, an<qjs::Context> ctx);
 
     an<Translation> Query(const string& input, const Segment& segment) override;
 
 private:
+    an<qjs::Runtime> rt_;
     an<qjs::Context> ctx_;
 };
 
