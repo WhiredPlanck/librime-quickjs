@@ -1,20 +1,20 @@
 #pragma once
 
-#include "lib/quickjspp.hpp"
-#include "rime/translation.h"
-#include "rime/translator.h"
+#include <rime/translation.h>
+#include <rime/translator.h>
+
+#include "lib/quickjs.hpp"
 
 namespace rime {
 
 class QuickJSTranslator : public Translator {
 public:
-    QuickJSTranslator(const Ticket& ticket, an<qjs::Runtime> rt, an<qjs::Context> ctx);
+    QuickJSTranslator(const Ticket& ticket, an<QuickJS> qjs);
 
     an<Translation> Query(const string& input, const Segment& segment) override;
 
 private:
-    an<qjs::Runtime> rt_;
-    an<qjs::Context> ctx_;
+    an<QuickJS> qjs_;
 };
 
 } // namespace rim

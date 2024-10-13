@@ -2,11 +2,10 @@
 #include <rime/registry.h>
 #include <rime_api.h>
 
-#include "lib/quickjspp.hpp"
-#include "quickjs_processor.h"
+#include "lib/quickjs.hpp"
 #include "quickjs_registry.h"
+#include "quickjs_processor.h"
 #include "quickjs_translator.h"
-#include "rime/common.h"
 
 using namespace rime;
 
@@ -14,13 +13,11 @@ static void rime_quickjs_initialize() {
   LOG(INFO) << "registering components from module 'quickjs'.";
   Registry &r = Registry::instance();
 
-  an<qjs::Runtime> rt(new qjs::Runtime);
-  an<qjs::Context> ctx = New<qjs::Context>(*rt);
+  an<QuickJS> qjs(new QuickJS);
+  JSRegistry::Register("RimeQuickJS", qjs->ctx);
 
-  JSRegistry::Register("RimeQuickJS", ctx);
-
-  r.Register("qjs_processor", new QuickJSComponent<QuickJSProcessor>(rt, ctx));
-  r.Register("qjs_translator", new QuickJSComponent<QuickJSTranslator>(rt, ctx));
+  r.Register("qjs_processor", new QuickJSComponent<QuickJSProcessor>(qjs));
+  r.Register("qjs_translator", new QuickJSComponent<QuickJSTranslator>(qjs));
 }
 
 static void rime_quickjs_finalize() {
