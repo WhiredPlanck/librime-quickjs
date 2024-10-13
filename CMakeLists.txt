@@ -3,11 +3,15 @@ cmake_minimum_required(VERSION 3.10)
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 
-find_package(QuickJS REQUIRED)
+include(QuickJS)
 
 aux_source_directory(src quickjs_src)
 
 add_library(rime-quickjs-objs OBJECT ${quickjs_src})
+target_include_directories(rime-quickjs-objs PRIVATE
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/deps/quickjs>
+)
 if(BUILD_SHARED_LIBS)
   set_target_properties(rime-quickjs-objs
     PROPERTIES
