@@ -2,7 +2,7 @@
 
 namespace rime {
 
-QuickJSProcessor::QuickJSProcessor(const Ticket& ticket, JSContext* ctx)
+QuickJSProcessor::QuickJSProcessor(const Ticket& ticket, an<qjs::Context> ctx)
     : Processor(ticket), ctx_(ctx) {};
 
 QuickJSProcessor::~QuickJSProcessor() {};

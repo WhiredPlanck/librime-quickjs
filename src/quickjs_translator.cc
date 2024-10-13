@@ -2,7 +2,7 @@
 
 namespace rime {
 
-QuickJSTranslator::QuickJSTranslator(const Ticket& ticket, JSContext* ctx)
+QuickJSTranslator::QuickJSTranslator(const Ticket& ticket, an<qjs::Context> ctx)
     : Translator(ticket), ctx_(ctx) {};
 
 an<Translation> QuickJSTranslator::Query(const string& input, const Segment& segment) {
