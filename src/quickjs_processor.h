@@ -2,6 +2,7 @@
 
 #include <rime/processor.h>
 #include <rime/ticket.h>
+#include <rime/key_event.h>
 
 #include "lib/quickjs.hpp"
 
@@ -16,6 +17,9 @@ public:
 
 private:
     an<QuickJS> qjs_;
+    an<qjs::Value> env_;
+    an<qjs::Value> exec_;
+    an<qjs::Value> exit_;
 };
 
 
