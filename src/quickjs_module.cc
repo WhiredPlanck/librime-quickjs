@@ -12,6 +12,14 @@ using namespace rime;
 
 namespace fs = std::filesystem;
 
+static qjs::Value eval_file(an<qjs::Context> ctx, const char* filename) {
+  auto buffer = qjs::detail::readFile(filename);
+  int module = JS_DetectModule(buffer->data(), buffer->size());
+  int eval_flags = module ? JS_EVAL_TYPE_MODULE : JS_EVAL_TYPE_GLOBAL;
+  LOG(INFO) << "eval_flags: " << eval_flags;
+  return ctx->eval(*buffer, filename, eval_flags);
+}
+
 static void quickjs_initialize(an<qjs::Context> ctx) {
   JSRegistry::Register("RimeQuickJS", ctx);
 
@@ -22,10 +30,10 @@ static void quickjs_initialize(an<qjs::Context> ctx) {
   try {
     if (fs::exists(userScript)) {
       LOG(INFO) << "loading user's JavaScript file '" << userScript << "'";
-      ctx->evalFile(userScript.c_str());
+      eval_file(ctx, userScript.c_str());
     } else if (fs::exists(sharedScript)) {
       LOG(INFO) << "loading shared JavaScript file '" << sharedScript << "'";
-      ctx->evalFile(sharedScript.c_str());
+      eval_file(ctx, sharedScript.c_str());
     }
   } catch (const qjs::exception&) {
     const auto &e = ctx->getException();
