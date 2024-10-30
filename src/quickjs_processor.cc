@@ -13,6 +13,9 @@ QuickJSProcessor::QuickJSProcessor(const Ticket& ticket, an<QuickJS> qjs)
             if (JS_IsFunction(qjs->ctx->ctx, val.v)) {
                 exec_ = New<qjs::Value>(std::move(val));
             } else {
+                auto init = (std::function<void(an<qjs::Value>)>) val["init"];
+                init(env_);
+
                 exec_ = New<qjs::Value>(val["exec"]);
                 exit_ = New<qjs::Value>(val["exit"]);
             }
@@ -40,7 +43,7 @@ ProcessResult QuickJSProcessor::ProcessKeyEvent(const KeyEvent& key_event) {
     try {
         if (!exec_) return kNoop;
         auto event = New<KeyEvent>(std::move(key_event));
-        auto res = exec_->as<std::function<int(const qjs::Value&, an<KeyEvent>)>>()(*env_, event);
+        auto res = ((std::function<int(an<qjs::Value>, an<KeyEvent>)>) *exec_)(env_, event);
         switch (res) {
             case 0: return kRejected;
             case 1: return kAccepted;
