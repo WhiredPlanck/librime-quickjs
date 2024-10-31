@@ -11,7 +11,7 @@ ProcessResult QuickJSProcessor::ProcessKeyEvent(const KeyEvent& key_event) {
     try {
         if (!exec_) return kNoop;
         auto event = New<KeyEvent>(std::move(key_event));
-        auto res = ((std::function<int(an<qjs::Value>, an<KeyEvent>)>) *exec_)(env_, event);
+        auto res = ((std::function<int(const qjs::Value&, an<KeyEvent>)>) *exec_)(*env_, event);
         switch (res) {
             case 0: return kRejected;
             case 1: return kAccepted;

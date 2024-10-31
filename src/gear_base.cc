@@ -13,7 +13,7 @@ GearBase::GearBase(const Ticket& ticket, an<QuickJS> qjs): qjs_(qjs) {
         } else {
             qjs::Value init = handler["init"];
             if (JS_IsFunction(qjs->ctx->ctx, init.v)) {
-                ((std::function<void(an<qjs::Value>)>) init)(env_);
+                ((std::function<void(const qjs::Value&)>) init)(*env_);
             }
 
             qjs::Value exec = handler["exec"];
@@ -38,7 +38,7 @@ GearBase::GearBase(const Ticket& ticket, an<QuickJS> qjs): qjs_(qjs) {
 GearBase::~GearBase() {
     if (exit_) {
         try {
-            ((std::function<void(an<qjs::Value>)>) *exit_)(env_);
+            ((std::function<void(const qjs::Value&)>) *exit_)(*env_);
         } catch (const qjs::exception&) {
             const auto& e = qjs_->ctx->getException();
             LOG(ERROR) << "QuickJS component deconstruct error(" << (string) (*env_)["nameSpace"] << "): " << (string) e;
