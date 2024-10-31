@@ -6,21 +6,22 @@ GearBase::GearBase(const Ticket& ticket, an<QuickJS> qjs): qjs_(qjs) {
     try {
         env_ = New<qjs::Value>(qjs->ctx->newObject());
         (*env_)["nameSpace"] = ticket.name_space;
-        auto val = qjs->ctx->eval(ticket.name_space);
-        if (JS_IsFunction(qjs->ctx->ctx, val.v)) {
-            exec_ = New<qjs::Value>(std::move(val));
+        auto modules = qjs->ctx->eval("qjsModules");
+        qjs::Value handler = modules[ticket.name_space.c_str()];
+        if (JS_IsFunction(qjs->ctx->ctx, handler.v)) {
+            exec_ = New<qjs::Value>(std::move(handler));
         } else {
-            qjs::Value init = val["init"];
+            qjs::Value init = handler["init"];
             if (JS_IsFunction(qjs->ctx->ctx, init.v)) {
                 ((std::function<void(an<qjs::Value>)>) init)(env_);
             }
 
-            qjs::Value exec = val["exec"];
+            qjs::Value exec = handler["exec"];
             if (JS_IsFunction(qjs->ctx->ctx, exec.v)) {
                 exec_ = New<qjs::Value>(std::move(exec));
             }
 
-            qjs::Value exit = val["exit"];
+            qjs::Value exit = handler["exit"];
             if (JS_IsFunction(qjs->ctx->ctx, exit.v)) {
                 exit_ = New<qjs::Value>(std::move(exit));
             }
