@@ -1,6 +1,7 @@
 #pragma once
 
 #include <rime/segmentor.h>
+#include <rime/segmentation.h>
 
 #include "gear_base.h"
 #include "lib/quickjs.hpp"
