@@ -13,11 +13,20 @@ QuickJSProcessor::QuickJSProcessor(const Ticket& ticket, an<QuickJS> qjs)
             if (JS_IsFunction(qjs->ctx->ctx, val.v)) {
                 exec_ = New<qjs::Value>(std::move(val));
             } else {
-                auto init = (std::function<void(an<qjs::Value>)>) val["init"];
-                init(env_);
+                qjs::Value init = val["init"];
+                if (JS_IsFunction(qjs->ctx->ctx, init.v)) {
+                    ((std::function<void(an<qjs::Value>)>) init)(env_);
+                }
 
-                exec_ = New<qjs::Value>(val["exec"]);
-                exit_ = New<qjs::Value>(val["exit"]);
+                qjs::Value exec = val["exec"];
+                if (JS_IsFunction(qjs->ctx->ctx, exec.v)) {
+                    exec_ = New<qjs::Value>(std::move(exec));
+                }
+
+                qjs::Value exit = val["exit"];
+                if (JS_IsFunction(qjs->ctx->ctx, exit.v)) {
+                    exit_ = New<qjs::Value>(std::move(exit));
+                }
             }
         } catch (const qjs::exception&) {
             const auto& e = qjs->ctx->getException();
@@ -31,7 +40,7 @@ QuickJSProcessor::QuickJSProcessor(const Ticket& ticket, an<QuickJS> qjs)
 QuickJSProcessor::~QuickJSProcessor() {
     if (exit_) {
         try {
-            exit_->as<std::function<void()>>()();
+            ((std::function<void(an<qjs::Value>)>) *exit_)(env_);
         } catch (const qjs::exception&) {
             const auto& e = qjs_->ctx->getException();
             LOG(ERROR) << "QuickJSProcessor::~QuickJSProcessor error(" << name_space_ << "): " << (string) e;
