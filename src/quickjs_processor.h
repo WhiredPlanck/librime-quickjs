@@ -4,22 +4,17 @@
 #include <rime/ticket.h>
 #include <rime/key_event.h>
 
+#include "gear_base.h"
 #include "lib/quickjs.hpp"
 
 namespace rime {
 
-class QuickJSProcessor : public Processor {
+class QuickJSProcessor : public Processor, GearBase {
 public:
     QuickJSProcessor(const Ticket& ticket, an<QuickJS> qjs);
-    virtual ~QuickJSProcessor();
+    virtual ~QuickJSProcessor() = default;
 
     ProcessResult ProcessKeyEvent(const KeyEvent& key_event) override;
-
-private:
-    an<QuickJS> qjs_;
-    an<qjs::Value> env_;
-    an<qjs::Value> exec_;
-    an<qjs::Value> exit_;
 };
 
 

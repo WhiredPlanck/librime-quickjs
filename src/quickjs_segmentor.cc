@@ -3,9 +3,7 @@
 namespace rime {
 
 QuickJSSegmentor::QuickJSSegmentor(const Ticket& ticket, an<QuickJS> qjs)
-    : Segmentor(ticket), qjs_(qjs) {}
-
-QuickJSSegmentor::~QuickJSSegmentor() {}
+    : Segmentor(ticket), GearBase(ticket, qjs) {}
 
 bool QuickJSSegmentor::Proceed(Segmentation* segmentation) {
     return false;

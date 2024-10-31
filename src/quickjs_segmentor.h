@@ -2,19 +2,17 @@
 
 #include <rime/segmentor.h>
 
+#include "gear_base.h"
 #include "lib/quickjs.hpp"
 
 namespace rime {
 
-class QuickJSSegmentor: public Segmentor {
+class QuickJSSegmentor: public Segmentor, GearBase {
 public:
     QuickJSSegmentor(const Ticket& ticket, an<QuickJS> qjs);
-    virtual ~QuickJSSegmentor();
+    virtual ~QuickJSSegmentor() = default;
 
     virtual bool Proceed(Segmentation* Segmentation);
-
-private:
-    an<QuickJS> qjs_;
 };
 
 } // namespace rime

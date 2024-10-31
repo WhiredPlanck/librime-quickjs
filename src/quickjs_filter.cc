@@ -4,9 +4,7 @@
 namespace rime {
 
 QuickJSFilter::QuickJSFilter(const Ticket& ticket, an<QuickJS> qjs)
-    : Filter(ticket), TagMatching(ticket), qjs_(qjs) {}
-
-QuickJSFilter::~QuickJSFilter() {}
+    : Filter(ticket), TagMatching(ticket), GearBase(ticket, qjs) {}
 
 an<Translation> QuickJSFilter::Apply(an<Translation> translation, CandidateList* candidates) {
     // TODO
