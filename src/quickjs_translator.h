@@ -2,6 +2,7 @@
 
 #include <rime/translation.h>
 #include <rime/translator.h>
+#include <rime/segmentation.h>
 
 #include "gear_base.h"
 #include "lib/quickjs.hpp"
