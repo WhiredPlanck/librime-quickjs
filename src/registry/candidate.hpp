@@ -11,15 +11,19 @@ using Module = qjs::Context::Module;
 namespace JSCandidate {
 
 inline void Register(Module& module) {
+    module.class_<Candidate>("Candidate")
+        .property<&Candidate::type, &Candidate::set_type>("type")
+        .property<&Candidate::start, &Candidate::set_start>("start")
+        .property<&Candidate::end, &Candidate::set_end>("end")
+        .property<&Candidate::quality, &Candidate::set_quality>("quality");
     module.class_<SimpleCandidate>("SimpleCandidate")
+        .base<Candidate>()
         .constructor<const string&, size_t, size_t, const string&, const string&, const string&>()
-        // .property<&SimpleCandidate::type, &SimpleCandidate::set_type>("type")
-        // .property<&SimpleCandidate::start, &SimpleCandidate::set_start>("start")
-        // .property<&SimpleCandidate::end, &SimpleCandidate::set_end>("end")
-        .property<&SimpleCandidate::quality, &SimpleCandidate::set_quality>("quality");
-        // .property<&SimpleCandidate::text, &SimpleCandidate::set_text>("text")
-        // .property<&SimpleCandidate::comment, &SimpleCandidate::set_comment>("comment")
-        // .property<&SimpleCandidate::preedit, &SimpleCandidate::set_preedit>("preedit");
+        .constructor<const string&, size_t, size_t, const string&, const string&>()
+        .constructor<const string&, size_t, size_t, const string&>()
+        .property<&SimpleCandidate::text, &SimpleCandidate::set_text>("text")
+        .property<&SimpleCandidate::comment, &SimpleCandidate::set_comment>("comment")
+        .property<&SimpleCandidate::preedit, &SimpleCandidate::set_preedit>("preedit");
 }
 
 } // namespace JSCandidate
