@@ -8,6 +8,7 @@ QuickJSTranslator::QuickJSTranslator(const Ticket& ticket, an<QuickJS> qjs)
     : Translator(ticket), GearBase(ticket, qjs) {};
 
 an<Translation> QuickJSTranslator::Query(const string& input, const Segment& segment) {
+    if (!exec_) return an<QuickJSTranslation>();
     auto generatorFunc = ((std::function<qjs::Value(const qjs::Value&, const string&, an<Segment>)>) *exec_);
     auto generator = generatorFunc(*env_, input, New<Segment>(segment));
     auto translation = New<QuickJSTranslation>(qjs_, New<qjs::Value>(std::move(generator)));
