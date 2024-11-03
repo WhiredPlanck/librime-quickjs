@@ -1453,6 +1453,16 @@ public:
         return Value{ctx, JS_EvalThis(ctx, v, buffer.data(), buffer.size(), filename, flags)};
     }
 
+    Value call(const Value& func_obj) {
+        assert(ctx);
+        return Value{ctx, JS_Call(ctx, func_obj.v, v, 0, nullptr)};
+    }
+
+    Value callMember(std::string_view name) {
+        assert(ctx);
+        return call((*this)[name.data()]);
+    }
+
 };
 
 /** Thin wrapper over JSRuntime * rt
