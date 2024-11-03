@@ -176,6 +176,31 @@ struct js_traits<double>
     }
 };
 
+// TODO: handle bigint
+template<>
+struct js_traits<size_t>
+{
+    /// @throws exception
+    static size_t unwrap(JSContext * ctx, JSValueConst v)
+    {
+        if constexpr (sizeof(size_t) > sizeof(int32_t)) {
+            return js_traits<int64_t>::unwrap(ctx, v);
+        } else {
+            return js_traits<int32_t>::unwrap(ctx, v);
+        }
+        
+    }
+
+    static JSValue wrap(JSContext * ctx, size_t i) noexcept
+    {
+        if constexpr (sizeof(size_t) > sizeof(int32_t)) {
+            return js_traits<int64_t>::wrap(ctx, i);
+        } else {
+            return js_traits<int32_t>::wrap(ctx, i);
+        }
+    }
+};
+
 namespace detail {
 /** Fake std::string_view which frees the string on destruction.
 */
