@@ -18,6 +18,9 @@ target_compile_definitions(quickjs PRIVATE ${QUICKJS_DEF})
 target_include_directories(quickjs INTERFACE
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
 )
+set_target_properties(quickjs PROPERTIES
+  INTERPROCEDURAL_OPTIMIZATION TRUE
+)
 
 if(UNIX OR MINGW)
   find_package(Threads)
