@@ -21,7 +21,7 @@ static qjs::Value eval_file(an<qjs::Context> ctx, const char* filename) {
 }
 
 static void quickjs_initialize(an<qjs::Context> ctx) {
-  JSRegistry::Register("RimeQuickJS", ctx);
+  JSRegistry::Register("rime-qjs", ctx);
 
   auto &deployer(Service::instance().deployer());
   const auto userScript = deployer.user_data_dir / "rime.js";
