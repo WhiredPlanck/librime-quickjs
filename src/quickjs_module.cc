@@ -7,6 +7,8 @@
 #include "quickjs_registry.h"
 #include "gear/quickjs_processor.h"
 #include "gear/quickjs_translator.h"
+#include "gear/quickjs_fiilter.h"
+#include "gear/quickjs_segmentor.h"
 
 using namespace rime;
 
@@ -50,6 +52,8 @@ static void rime_quickjs_initialize() {
 
   r.Register("qjs_processor", new QuickJSComponent<QuickJSProcessor>(qjs));
   r.Register("qjs_translator", new QuickJSComponent<QuickJSTranslator>(qjs));
+  r.Register("qjs_segmentor", new QuickJSComponent<QuickJSSegmentor>(qjs));
+  r.Register("qjs_filter", new QuickJSComponent<QuickJSFilter>(qjs));
 }
 
 static void rime_quickjs_finalize() {
