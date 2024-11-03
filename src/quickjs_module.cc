@@ -5,8 +5,8 @@
 
 #include "lib/quickjs.hpp"
 #include "quickjs_registry.h"
-#include "quickjs_processor.h"
-#include "quickjs_translator.h"
+#include "gear/quickjs_processor.h"
+#include "gear/quickjs_translator.h"
 
 using namespace rime;
 
