@@ -10,7 +10,7 @@ using Module = qjs::Context::Module;
 namespace JSSegment {
 
 inline void Register(Module& module) {
-    module.class_<Segment>("segment")
+    module.class_<Segment>("Segment")
         .fun<&Segment::start>("start")
         .fun<&Segment::end>("end");
 }
