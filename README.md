@@ -7,4 +7,4 @@ Features
  - [WIP] Provides high-level programming model for translators and filters
  - Loaded dynamically as a librime plugin
 
-Documents are comming soon.
+See [Wiki](https://github.com/WhiredPlanck/librime-quickjs/wiki) for more infomations.
