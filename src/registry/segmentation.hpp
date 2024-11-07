@@ -7,6 +7,7 @@
 using namespace rime;
 
 using Module = qjs::Context::Module;
+
 namespace JSSegment {
 
 inline void Register(Module& module) {

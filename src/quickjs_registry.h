@@ -3,7 +3,8 @@
 #include <memory>
 #include "registry/candidate.hpp"
 #include "registry/keyevent.hpp"
-#include "registry/segment.hpp"
+#include "registry/segmentation.hpp"
+#include "registry/translation.hpp"
 
 namespace JSRegistry {
 
@@ -12,6 +13,7 @@ inline void Register(std::string_view name, std::shared_ptr<qjs::Context> ctx) {
     JSKeyEvent::Register(module);
     JSCandidate::Register(module);
     JSSegment::Register(module);
+    JSTranslation::Register(module);
 }
 
 } // namespace JSRegistry
