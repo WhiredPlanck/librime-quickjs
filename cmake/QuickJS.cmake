@@ -1,6 +1,16 @@
 project(quickjs LANGUAGES C)
 
-file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/deps/quickjs/VERSION" QJS_VERSION)
+if(APPLE OR WIN32)
+file(RENAME
+  "${CMAKE_CURRENT_SOURCE_DIR}/deps/quickjs/VERSION"
+  "${CMAKE_CURRENT_SOURCE_DIR}/deps/quickjs/VERSION.txt"
+)
+set(VERSION_FILE "VERSION.txt")
+else()
+set(VERSION_FILE "VERSION")
+endif()
+
+file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/deps/quickjs/${VERSION_FILE}" QJS_VERSION)
 
 set(QUICKJS_SRC 
     "${CMAKE_CURRENT_SOURCE_DIR}/deps/quickjs/quickjs.c"
