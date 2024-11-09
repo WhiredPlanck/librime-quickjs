@@ -32,10 +32,10 @@ static void quickjs_initialize(an<qjs::Context> ctx) {
   try {
     if (fs::exists(userScript)) {
       LOG(INFO) << "loading user's JavaScript file '" << userScript << "'";
-      eval_file(ctx, userScript.c_str());
+      eval_file(ctx, userScript.u8string().c_str());
     } else if (fs::exists(sharedScript)) {
       LOG(INFO) << "loading shared JavaScript file '" << sharedScript << "'";
-      eval_file(ctx, sharedScript.c_str());
+      eval_file(ctx, sharedScript.u8string().c_str());
     }
   } catch (const qjs::exception&) {
     const auto &e = ctx->getException();
