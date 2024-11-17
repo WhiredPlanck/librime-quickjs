@@ -8,8 +8,9 @@ include(QuickJS)
 aux_source_directory(src quickjs_src)
 aux_source_directory(src/lib quickjs_lib)
 aux_source_directory(src/gear quickjs_gear)
+aux_source_directory(src/extend quickjs_extend)
 
-add_library(rime-quickjs-objs OBJECT ${quickjs_src} ${quickjs_lib} ${quickjs_gear})
+add_library(rime-quickjs-objs OBJECT ${quickjs_src} ${quickjs_lib} ${quickjs_gear} ${quickjs_extend})
 target_include_directories(rime-quickjs-objs PRIVATE
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/deps/quickjs>
