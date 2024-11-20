@@ -2,6 +2,7 @@
 
 #include <memory>
 #include "registry/candidate.hpp"
+#include "registry/config.hpp"
 #include "registry/datetime.hpp"
 #include "registry/keyevent.hpp"
 #include "registry/opencc.hpp"
@@ -16,6 +17,7 @@ inline void Register(std::string_view name, std::shared_ptr<qjs::Context> ctx) {
     JSCandidate::Register(module);
     JSSegment::Register(module);
     JSTranslation::Register(module);
+    JSConfig::Register(module);
     JSOpenCC::Register(module);
     JSDatetime::Register(module);
 }

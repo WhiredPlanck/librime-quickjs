@@ -1,11 +1,15 @@
 #include "gear_base.h"
 
+#include <rime/engine.h>
+#include <rime/schema.h>
+
 namespace rime {
 
 GearBase::GearBase(const Ticket& ticket, an<QuickJS> qjs): qjs_(qjs) {
     try {
         env_ = New<qjs::Value>(qjs->ctx->newObject());
         (*env_)["nameSpace"] = ticket.name_space;
+        (*env_)["config"] = ticket.engine->schema()->config();
         an<qjs::Value> handlerPtr;
         try {
             handlerPtr = New<qjs::Value>(qjs->ctx->eval(ticket.name_space));
