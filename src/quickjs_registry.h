@@ -6,6 +6,7 @@
 #include "registry/datetime.hpp"
 #include "registry/keyevent.hpp"
 #include "registry/opencc.hpp"
+#include "registry/schema.hpp"
 #include "registry/segmentation.hpp"
 #include "registry/translation.hpp"
 
@@ -15,6 +16,7 @@ inline void Register(std::string_view name, std::shared_ptr<qjs::Context> ctx) {
     auto &module = ctx->addModule(name.data());
     JSKeyEvent::Register(module);
     JSCandidate::Register(module);
+    JSSchema::Register(module);
     JSSegment::Register(module);
     JSTranslation::Register(module);
     JSConfig::Register(module);
