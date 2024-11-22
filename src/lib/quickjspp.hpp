@@ -1676,6 +1676,13 @@ public:
                 return *this;
             }
 
+            template <auto F>
+            class_registrar& add(const char * name)
+            {
+                prototype[name] = fwrapper<F, true>{name};
+                return *this;
+            }
+
             /** Add class member function or class member variable F
              * Example:
              * struct T { int var; int func(); }
