@@ -19,4 +19,10 @@ public:
         buffer << std::put_time(localtime(&tt), fmt.data());
         return std::move(buffer.str());
     }
+
+    static std::string formatTime(std::string_view fmt, std::time_t time) {
+        std::ostringstream buffer;
+        buffer << std::put_time(localtime(&time), fmt.data());
+        return std::move(buffer.str());
+    } 
 };
