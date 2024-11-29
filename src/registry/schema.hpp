@@ -13,7 +13,7 @@ inline void Register(Module& module) {
     module.class_<Schema>("Schema")
         .property<&Schema::schema_id>("schemaId")
         .property<&Schema::schema_name>("schemaName")
-        .property<&Schema::config>("config");
+        .fun<&Schema::config>("config");
 }
 
 } // namespace JSSchema
