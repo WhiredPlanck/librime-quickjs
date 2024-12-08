@@ -9,7 +9,7 @@
 
 namespace fs = std::filesystem;
 
-OpenCCComponent::OpenCCComponent(const string& configPath) {
+OpenCCComponent::OpenCCComponent(std::string_view configPath) {
   const auto& deployer = Service::instance().deployer();
   const auto userConfig = deployer.user_data_dir / "opencc" / configPath;
   const auto sharedConfig = deployer.shared_data_dir / "opencc" / configPath;
@@ -22,7 +22,7 @@ OpenCCComponent::OpenCCComponent(const string& configPath) {
     }
     if (!foundPath.empty()) {
       opencc::Config config;
-      converter_ = config.NewFromFile(configPath);
+      converter_ = config.NewFromFile(string{configPath});
       const auto conversions =
           converter_->GetConversionChain()->GetConversions();
       dict_ = conversions.front()->GetDict();
@@ -33,18 +33,18 @@ OpenCCComponent::OpenCCComponent(const string& configPath) {
   }
 }
 
-std::optional<string> OpenCCComponent::convertText(const string& text) {
+std::optional<string> OpenCCComponent::convertText(std::string_view text) {
   if (!converter_)
     return std::nullopt;
-  const auto& result = converter_->Convert(text);
-  return std::make_optional(std::move(result));
+  const auto& result = converter_->Convert(string{text});
+  return std::move(result);
 }
 
-std::optional<string> OpenCCComponent::ramdomConvertText(const string& text) {
+std::optional<string> OpenCCComponent::ramdomConvertText(std::string_view text) {
   if (!dict_)
     return std::nullopt;
   const auto conversions = converter_->GetConversionChain()->GetConversions();
-  const char* phrase = text.c_str();
+  const char* phrase = text.data();
   string result;
   for (auto conversion : conversions) {
     auto dict = conversion->GetDict();
@@ -71,8 +71,8 @@ std::optional<string> OpenCCComponent::ramdomConvertText(const string& text) {
   return std::make_optional(std::move(result));
 }
 
-vector<string> OpenCCComponent::convertWord(const string& text) {
-  vector<string> original{text};
+vector<string> OpenCCComponent::convertWord(std::string_view text) {
+  vector<string> original{string{text}};
   if (!converter_)
     return std::move(original);
   const auto conversions = converter_->GetConversionChain()->GetConversions();

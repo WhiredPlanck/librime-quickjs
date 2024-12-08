@@ -8,11 +8,11 @@ using namespace rime;
 
 class OpenCCComponent {
 public:
-    OpenCCComponent(const string& configPath);
+    OpenCCComponent(std::string_view configPath);
 
-    std::optional<string> convertText(const string& text);
-    std::optional<string> ramdomConvertText(const string& text);
-    vector<string> convertWord(const string& text);
+    std::optional<string> convertText(std::string_view text);
+    std::optional<string> ramdomConvertText(std::string_view text);
+    vector<string> convertWord(std::string_view text);
 
 private:
     opencc::ConverterPtr converter_;
