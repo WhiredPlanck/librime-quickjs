@@ -1,5 +1,6 @@
 #include "quickjs.hpp"
 #include <cstddef>
+#include "lib/quickjspp.hpp"
 #include "quickjs-libc.h"
 #include "quickjs.h"
 
@@ -13,6 +14,7 @@ QuickJS::QuickJS(bool bignumExt): rt(new Runtime) {
     ctx = std::make_shared<Context>(JS_NewCustomContext(rt->rt));
 
     js_std_add_helpers(ctx->ctx, 0, NULL);
+    JS_AddExtraHelper(ctx);
 
     /* make 'std' and 'os' visible to non module code */
     ctx->eval(R"xxx(
@@ -27,3 +29,5 @@ QuickJS::~QuickJS() {
     js_std_loop(ctx->ctx);
     js_std_free_handlers(rt->rt);
 }
+
+
