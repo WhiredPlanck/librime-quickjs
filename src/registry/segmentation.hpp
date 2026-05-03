@@ -2,7 +2,7 @@
 
 #include <rime/segmentation.h>
 
-#include "lib/quickjspp.hpp"
+#include <quickjspp.hpp>
 
 using namespace rime;
 
