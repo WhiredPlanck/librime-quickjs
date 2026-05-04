@@ -1,7 +1,7 @@
 #pragma once
 
 #include "extend/datetime.hpp"
-#include "lib/quickjspp.hpp"
+#include <quickjspp.hpp>
 
 using Module = qjs::Context::Module;
 

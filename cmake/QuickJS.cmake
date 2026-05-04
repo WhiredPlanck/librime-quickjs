@@ -25,8 +25,8 @@ set(QUICKJS_DEF CONFIG_VERSION="${QJS_VERSION}" _GNU_SOURCE CONFIG_BIGNUM)
 add_library(quickjs ${QUICKJS_SRC})
 add_library(QuickJS::QuickJS ALIAS quickjs)
 target_compile_definitions(quickjs PRIVATE ${QUICKJS_DEF})
-target_include_directories(quickjs INTERFACE
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+target_include_directories(quickjs PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/deps/quickjs>
 )
 set_target_properties(quickjs PROPERTIES
   INTERPROCEDURAL_OPTIMIZATION TRUE

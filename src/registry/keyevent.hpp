@@ -1,6 +1,6 @@
 #pragma once
 
-#include "lib/quickjspp.hpp"
+#include <quickjspp.hpp>
 #include "rime/key_event.h"
 
 using namespace rime;

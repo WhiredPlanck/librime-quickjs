@@ -2,7 +2,7 @@
 
 #include <rime/translation.h>
 
-#include "lib/quickjspp.hpp"
+#include <quickjspp.hpp>
 
 using namespace rime;
 

@@ -1,6 +1,6 @@
 #include "quickjs_processor.h"
 
-#include "lib/quickjspp.hpp"
+#include <quickjspp.hpp>
 
 namespace rime {
 

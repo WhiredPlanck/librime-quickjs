@@ -2,7 +2,7 @@
 
 #include <rime/candidate.h>
 
-#include "lib/quickjspp.hpp"
+#include <quickjspp.hpp>
 
 using namespace rime;
 
