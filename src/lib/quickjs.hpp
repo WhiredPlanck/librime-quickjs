@@ -1,6 +1,6 @@
 #pragma once
 
-#include "lib/quickjspp.hpp"
+#include <quickjspp.hpp>
 #include "quickjs-libc.h"
 #include "quickjs.h"
 #include <rime/common.h>

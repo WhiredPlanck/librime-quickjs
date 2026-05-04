@@ -1,6 +1,6 @@
 #pragma once
 
-#include "lib/quickjspp.hpp"
+#include <quickjspp.hpp>
 #include "rime/engine.h"
 
 using namespace rime;

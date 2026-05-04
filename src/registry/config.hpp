@@ -3,7 +3,7 @@
 #include <rime/config.h>
 #include <optional>
 
-#include "lib/quickjspp.hpp"
+#include <quickjspp.hpp>
 
 using namespace rime;
 
