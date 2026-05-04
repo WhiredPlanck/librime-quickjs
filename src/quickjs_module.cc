@@ -14,7 +14,7 @@ using namespace rime;
 
 namespace fs = std::filesystem;
 
-static qjs::Value eval_file(an<qjs::Context> ctx, const char* filename) {
+static qjs::Value eval_file(qjs::Context* ctx, const char* filename) {
   auto buffer = qjs::detail::readFile(filename);
   int module = JS_DetectModule(buffer->data(), buffer->size());
   int eval_flags = module ? JS_EVAL_TYPE_MODULE : JS_EVAL_TYPE_GLOBAL;
@@ -22,7 +22,7 @@ static qjs::Value eval_file(an<qjs::Context> ctx, const char* filename) {
   return ctx->eval(*buffer, filename, eval_flags);
 }
 
-static void quickjs_initialize(an<qjs::Context> ctx) {
+static void quickjs_initialize(qjs::Context* ctx) {
   JSRegistry::Register("rime-qjs", ctx);
 
   auto &deployer(Service::instance().deployer());
@@ -48,7 +48,7 @@ static void rime_quickjs_initialize() {
   Registry &r = Registry::instance();
 
   an<QuickJS> qjs(new QuickJS);
-  quickjs_initialize(qjs->ctx);
+  quickjs_initialize(qjs->ctx.get());
 
   r.Register("qjs_processor", new QuickJSComponent<QuickJSProcessor>(qjs));
   r.Register("qjs_translator", new QuickJSComponent<QuickJSTranslator>(qjs));

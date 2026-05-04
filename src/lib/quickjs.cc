@@ -11,10 +11,10 @@ QuickJS::QuickJS(bool bignumExt): rt(new Runtime) {
 
     JS_SetModuleLoaderFunc(rt->rt, NULL, js_module_loader, NULL);
 
-    ctx = std::make_shared<Context>(JS_NewCustomContext(rt->rt));
+    ctx = std::make_unique<Context>(JS_NewCustomContext(rt->rt));
 
     js_std_add_helpers(ctx->ctx, 0, NULL);
-    JS_AddExtraHelper(ctx);
+    JS_AddExtraHelper(ctx.get());
 
     /* make 'std' and 'os' visible to non module code */
     ctx->eval(R"xxx(

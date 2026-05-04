@@ -13,7 +13,7 @@
 
 namespace JSRegistry {
 
-inline void Register(std::string_view name, std::shared_ptr<qjs::Context> ctx) {
+inline void Register(std::string_view name, qjs::Context* ctx) {
     auto &module = ctx->addModule(name.data());
     JSEngine::Register(module);
     JSKeyEvent::Register(module);
