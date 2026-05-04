@@ -1,17 +1,16 @@
-#pragma once
-
 #include "extend/datetime.hpp"
-#include <quickjspp.hpp>
 
-using Module = qjs::Context::Module;
+#include "qjs_registry.h"
 
-namespace JSDatetime {
+namespace rime {
+namespace quickjs {
 
-inline void Register(Module& module) {
+void registerDatetime(Module& module) {
     module.class_<Datetime>("Datetime")
         .constructor<>()
         .static_fun<&Datetime::format>("format")
         .static_fun<&Datetime::formatTime>("formatTime");
 }
 
+}
 }

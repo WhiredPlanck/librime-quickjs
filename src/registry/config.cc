@@ -1,15 +1,10 @@
-#pragma once
-
 #include <rime/config.h>
 #include <optional>
 
-#include <quickjspp.hpp>
+#include "qjs_registry.h"
 
-using namespace rime;
-
-using Module = qjs::Context::Module;
-
-namespace JSConfig {
+namespace rime {
+namespace quickjs {
 
 #define GETTER_ALIAS(R, N, F) \
 static std::optional<R> N(Config * c, const string& path) { \
@@ -78,7 +73,7 @@ struct ConfigMapAlias {
     }
 };
 
-inline void Register(Module& module) {
+void registerConfig(Module& module) {
     module.class_<Config>("Config")
         .fun<&Config::IsNull>("isNull")
         .fun<&Config::IsValue>("isValue")
@@ -121,4 +116,5 @@ inline void Register(Module& module) {
         .fun<&ConfigMapAlias::keys>("keys");
 }
 
-} // namespace JSConfig
+}
+}

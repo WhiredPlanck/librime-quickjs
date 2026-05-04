@@ -1,14 +1,9 @@
-#pragma once
-
 #include <rime/candidate.h>
 
-#include <quickjspp.hpp>
+#include "qjs_registry.h"
 
-using namespace rime;
-
-using Module = qjs::Context::Module;
-
-namespace JSCandidate {
+namespace rime {
+namespace quickjs {
 
 static auto getGenuineCandidate(an<Candidate> cand) {
     return Candidate::GetGenuineCandidate(cand);
@@ -18,7 +13,7 @@ static auto getGenuineCandidates(an<Candidate> cand) {
     return Candidate::GetGenuineCandidates(cand);
 }
 
-inline void Register(Module& module) {
+void registerCandidate(Module& module) {
     module.class_<Candidate>("Candidate")
         .property<&Candidate::type, &Candidate::set_type>("type")
         .property<&Candidate::start, &Candidate::set_start>("start")
@@ -56,4 +51,5 @@ inline void Register(Module& module) {
         .fun<&UniquifiedCandidate::Append>("append");
 }
 
-} // namespace JSCandidate
+}
+}
