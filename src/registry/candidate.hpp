@@ -10,15 +10,23 @@ using Module = qjs::Context::Module;
 
 namespace JSCandidate {
 
+static auto getGenuineCandidate(an<Candidate> cand) {
+    return Candidate::GetGenuineCandidate(cand);
+}
+
+static auto getGenuineCandidates(an<Candidate> cand) {
+    return Candidate::GetGenuineCandidates(cand);
+}
+
 inline void Register(Module& module) {
     module.class_<Candidate>("Candidate")
         .property<&Candidate::type, &Candidate::set_type>("type")
         .property<&Candidate::start, &Candidate::set_start>("start")
         .property<&Candidate::end, &Candidate::set_end>("end")
         .property<&Candidate::quality, &Candidate::set_quality>("quality")
-        .property<&Candidate::text>("text")
-        .static_fun<&Candidate::GetGenuineCandidate>("getGenuineCandidate")
-        .static_fun<&Candidate::GetGenuineCandidates>("getGenuineCandidates");
+        .property<&Candidate::text>("text");
+        // .static_fun<&getGenuineCandidate>("getGenuineCandidate")
+        // .static_fun<&getGenuineCandidates>("getGenuineCandidates");
     module.class_<SimpleCandidate>("SimpleCandidate")
         .base<Candidate>()
         .constructor<const string&, size_t, size_t, const string&, const string&, const string&>()
