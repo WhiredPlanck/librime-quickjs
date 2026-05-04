@@ -84,11 +84,11 @@ inline void Register(Module& module) {
         .fun<&Config::IsValue>("isValue")
         .fun<&Config::IsList>("isList")
         .fun<&Config::IsMap>("isMap")
-        .add<&ConfigAlias::getBool>("getBool")
-        .add<&ConfigAlias::getInt>("getInt")
-        .add<&ConfigAlias::getDouble>("getDouble")
-        .add<&ConfigAlias::getString>("getString")
-        .add<&ConfigAlias::getItem>("getItem")
+        .fun<&ConfigAlias::getBool>("getBool")
+        .fun<&ConfigAlias::getInt>("getInt")
+        .fun<&ConfigAlias::getDouble>("getDouble")
+        .fun<&ConfigAlias::getString>("getString")
+        .fun<&ConfigAlias::getItem>("getItem")
         .fun<&Config::GetValue>("getValue")
         .fun<&Config::GetList>("getList")
         .fun<&Config::GetMap>("getMap")
@@ -99,10 +99,10 @@ inline void Register(Module& module) {
     
     module.class_<ConfigValue>("ConfigValue")
         .base<ConfigItem>()
-        .add<&ConfigValueAlias::getBool>("getBool")
-        .add<&ConfigValueAlias::getInt>("getInt")
-        .add<&ConfigValueAlias::getDouble>("getDouble")
-        .add<&ConfigValueAlias::getString>("getString");
+        .fun<&ConfigValueAlias::getBool>("getBool")
+        .fun<&ConfigValueAlias::getInt>("getInt")
+        .fun<&ConfigValueAlias::getDouble>("getDouble")
+        .fun<&ConfigValueAlias::getString>("getString");
 
     module.class_<ConfigList>("ConfigList")
         .base<ConfigItem>()
@@ -117,8 +117,8 @@ inline void Register(Module& module) {
         .fun<&ConfigMap::GetValue>("getValue")
         .fun<&ConfigMap::HasKey>("hasKey")
         .fun<&ConfigMap::empty>("empty")
-        .add<&ConfigMapAlias::size>("size")
-        .add<&ConfigMapAlias::keys>("keys");
+        .fun<&ConfigMapAlias::size>("size")
+        .fun<&ConfigMapAlias::keys>("keys");
 }
 
 } // namespace JSConfig

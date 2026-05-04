@@ -1,8 +1,7 @@
 #pragma once
 
 #include <quickjspp.hpp>
-#include "quickjs-libc.h"
-#include "quickjs.h"
+#include "quickjs/quickjs-libc.h"
 #include <rime/common.h>
 #include <string_view>
 

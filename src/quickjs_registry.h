@@ -1,6 +1,8 @@
 #pragma once
 
 #include <memory>
+
+#include "lib/qjs_traits.hpp"
 #include "registry/candidate.hpp"
 #include "registry/config.hpp"
 #include "registry/datetime.hpp"

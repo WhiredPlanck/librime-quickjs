@@ -1,14 +1,12 @@
-#include "quickjs.hpp"
 #include <cstddef>
-#include <quickjspp.hpp>
-#include "quickjs-libc.h"
-#include "quickjs.h"
+
+#include "quickjs.hpp"
 
 QuickJS::QuickJS(): rt(new Runtime) {
     js_std_set_worker_new_context_func(JS_NewCustomContext);
     js_std_init_handlers(rt->rt);
 
-    JS_SetModuleLoaderFunc(rt->rt, NULL, js_module_loader, NULL);
+    JS_SetModuleLoaderFunc2(rt->rt, NULL, js_module_loader, NULL, NULL);
 
     ctx = std::make_unique<Context>(JS_NewCustomContext(rt->rt));
 

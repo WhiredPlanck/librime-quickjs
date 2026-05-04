@@ -1,6 +1,6 @@
 #pragma once
 
-#include <quickjs.h>
+#include "quickjs/quickjs.h"
 
 #include <vector>
 #include <string_view>
@@ -173,31 +173,6 @@ struct js_traits<double>
     static JSValue wrap(JSContext * ctx, double i) noexcept
     {
         return JS_NewFloat64(ctx, i);
-    }
-};
-
-// TODO: handle bigint
-template<>
-struct js_traits<size_t>
-{
-    /// @throws exception
-    static size_t unwrap(JSContext * ctx, JSValueConst v)
-    {
-        if constexpr (sizeof(size_t) > sizeof(int32_t)) {
-            return js_traits<int64_t>::unwrap(ctx, v);
-        } else {
-            return js_traits<int32_t>::unwrap(ctx, v);
-        }
-        
-    }
-
-    static JSValue wrap(JSContext * ctx, size_t i) noexcept
-    {
-        if constexpr (sizeof(size_t) > sizeof(int32_t)) {
-            return js_traits<int64_t>::wrap(ctx, i);
-        } else {
-            return js_traits<int32_t>::wrap(ctx, i);
-        }
     }
 };
 
@@ -431,10 +406,6 @@ struct js_traits<std::variant<Ts...>>
             case JS_TAG_BOOL:
                 return is_boolean<T>::value || std::is_integral_v<T> || std::is_floating_point_v<T>;
 
-            case JS_TAG_BIG_DECIMAL:
-                [[fallthrough]];
-            case JS_TAG_BIG_FLOAT:
-                [[fallthrough]];
             case JS_TAG_FLOAT64:
             default: // >JS_TAG_FLOAT64 (JS_NAN_BOXING)
                 return is_double<T>::value || std::is_floating_point_v<T>;
@@ -498,11 +469,6 @@ struct js_traits<std::variant<Ts...>>
                 [[fallthrough]];
             case JS_TAG_EXCEPTION:
                 break;
-
-            case JS_TAG_BIG_DECIMAL:
-                [[fallthrough]];
-            case JS_TAG_BIG_FLOAT:
-                [[fallthrough]];
 
             case JS_TAG_FLOAT64:
                 [[fallthrough]];
@@ -1676,13 +1642,6 @@ public:
                 return *this;
             }
 
-            template <auto F>
-            class_registrar& add(const char * name)
-            {
-                prototype[name] = fwrapper<F, true>{name};
-                return *this;
-            }
-
             /** Add class member function or class member variable F
              * Example:
              * struct T { int var; int func(); }
@@ -1817,6 +1776,11 @@ public:
 
     ~Context()
     {
+        // We need to run the GC to flush finalization of any pending unhandled
+        // rejected promises before we free the context, as they depend on it's
+        // opaque value.
+        JS_RunGC(JS_GetRuntime(ctx));
+        
         modules.clear();
         JS_FreeContext(ctx);
     }
@@ -1878,6 +1842,19 @@ public:
     {
         assert(buffer.data()[buffer.size()] == '\0' && "eval buffer is not null-terminated"); // JS_Eval requirement
         JSValue v = JS_Eval(ctx, buffer.data(), buffer.size(), filename, flags);
+
+        // For some time now module loads can return a (rejected) promise on
+        // failure. Keep old compatibility API for quickjspp's eval.
+        if(JS_PromiseState(ctx, v) == JS_PROMISE_REJECTED) {
+            JSValue result = JS_PromiseResult(ctx, v);
+            if(JS_IsError(ctx, result)) {
+                JS_FreeValue(ctx, v);
+                v = JS_Throw(ctx, result);
+            }
+            else {
+                JS_FreeValue(ctx, result);
+            }
+        }
         return Value{ctx, std::move(v)};
     }
 
