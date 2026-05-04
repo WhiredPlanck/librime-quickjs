@@ -4,8 +4,7 @@
 #include "quickjs-libc.h"
 #include "quickjs.h"
 
-QuickJS::QuickJS(bool bignumExt): rt(new Runtime) {
-    bignum_ext = bignumExt;
+QuickJS::QuickJS(): rt(new Runtime) {
     js_std_set_worker_new_context_func(JS_NewCustomContext);
     js_std_init_handlers(rt->rt);
 
