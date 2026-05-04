@@ -28,7 +28,7 @@ static JSContext *JS_NewCustomContext(JSRuntime *rt)
         return ctx;
     }
 
-inline void JS_AddExtraHelper(std::shared_ptr<qjs::Context> ctx) {
+inline void JS_AddExtraHelper(qjs::Context* ctx) {
     auto console = ctx->global()["console"];
     console["info"] = [ctx](std::string_view msg) {
         LOG(INFO) << msg;
@@ -46,8 +46,8 @@ inline void JS_AddExtraHelper(std::shared_ptr<qjs::Context> ctx) {
 
 class QuickJS {
 public:
-    std::shared_ptr<Runtime> rt;
-    std::shared_ptr<Context> ctx;
+    std::unique_ptr<Runtime> rt;
+    std::unique_ptr<Context> ctx;
 
     QuickJS(bool bignumExt = false);
     ~QuickJS();
