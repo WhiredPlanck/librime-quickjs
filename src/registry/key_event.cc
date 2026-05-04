@@ -1,20 +1,16 @@
-#pragma once
+#include <rime/key_event.h>
 
-#include <quickjspp.hpp>
-#include "rime/key_event.h"
+#include "qjs_registry.h"
 
-using namespace rime;
-
-using Module = qjs::Context::Module;
-
-namespace JSKeyEvent {
+namespace rime {
+namespace quickjs {
 
 struct KeyEventAlias {
     static int getKeycode(KeyEvent * ke) { return ke->keycode(); }
     static int getModifier(KeyEvent * ke) { return ke->modifier(); }
 };
 
-inline void Register(Module &module) {
+void registerKeyEvent(Module &module) {
     module.class_<KeyEvent>("KeyEvent")
         .constructor<>()
         .constructor<int, int>()
@@ -30,5 +26,5 @@ inline void Register(Module &module) {
         .fun<&KeyEvent::Parse>("parse");
 }
 
-} // namespace JSKeyEvent
-
+}
+}

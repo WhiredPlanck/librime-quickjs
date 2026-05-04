@@ -4,7 +4,7 @@
 #include <rime_api.h>
 
 #include "lib/quickjs.hpp"
-#include "quickjs_registry.h"
+#include "registry/qjs_registry.h"
 #include "gear/quickjs_processor.h"
 #include "gear/quickjs_translator.h"
 #include "gear/quickjs_fiilter.h"
@@ -23,7 +23,7 @@ static qjs::Value eval_file(qjs::Context* ctx, const char* filename) {
 }
 
 static void quickjs_initialize(qjs::Context* ctx) {
-  JSRegistry::Register("rime-qjs", ctx);
+  rime::quickjs::initializeRegistries(ctx);
 
   auto &deployer(Service::instance().deployer());
   const auto userScript = deployer.user_data_dir / "rime.js";

@@ -1,20 +1,16 @@
-#pragma once
-
 #include <rime/translation.h>
 
-#include <quickjspp.hpp>
+#include "qjs_registry.h"
 
-using namespace rime;
+namespace rime {
+namespace quickjs {
 
-using Module = qjs::Context::Module;
-
-namespace JSTranslation {
-
-inline void Register(Module& module) {
+void registerTranslation(Module& module) {
     module.class_<Translation>("Translation")
         .fun<&Translation::Next>("next")
         .fun<&Translation::Peek>("peek")
         .property<&Translation::exhausted>("exhausted");
 }
 
+}
 }

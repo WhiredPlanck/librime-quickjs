@@ -1,13 +1,11 @@
-#pragma once
-
 #include "extend/opencc.hpp"
-#include <quickjspp.hpp>
 
-using Module = qjs::Context::Module;
+#include "qjs_registry.h"
 
-namespace JSOpenCC {
+namespace rime {
+namespace quickjs {
 
-inline void Register(Module &module) {
+void registerOpenCC(Module &module) {
     module.class_<OpenCCComponent>("OpenCC")
         .constructor<const string&>()
         .fun<&OpenCCComponent::convertText>("convertText")
@@ -15,4 +13,5 @@ inline void Register(Module &module) {
         .fun<&OpenCCComponent::convertWord>("convertWord");
 }
 
-} // namespace JSOpenCC
+}
+}
