@@ -14,7 +14,7 @@ file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/deps/quickjs/${VERSION_FILE}" QJS_VERS
 
 set(QUICKJS_SRC 
     "${CMAKE_CURRENT_SOURCE_DIR}/deps/quickjs/quickjs.c"
-    "${CMAKE_CURRENT_SOURCE_DIR}/deps/quickjs/libbf.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/deps/quickjs/dtoa.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/deps/quickjs/libunicode.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/deps/quickjs/libregexp.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/deps/quickjs/cutils.c"
@@ -26,7 +26,7 @@ add_library(quickjs ${QUICKJS_SRC})
 add_library(QuickJS::QuickJS ALIAS quickjs)
 target_compile_definitions(quickjs PRIVATE ${QUICKJS_DEF})
 target_include_directories(quickjs PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/deps/quickjs>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/deps>
 )
 set_target_properties(quickjs PROPERTIES
   INTERPROCEDURAL_OPTIMIZATION TRUE
