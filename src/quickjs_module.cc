@@ -29,12 +29,45 @@ static void quickjs_initialize() {
   rime::quickjs::initializeRegistries(ctx);
 
   auto &deployer(Service::instance().deployer());
+  const auto userDir = deployer.user_data_dir;
+  const auto sharedDir = deployer.shared_data_dir;
+
+  auto jsModuleLoader = [&userDir, &sharedDir](std::string_view filename) -> qjs::Context::ModuleData {
+    std::string name(filename);
+
+    // 1) read directly if absolute / relative paths are used
+    {
+      fs::path p{name};
+      if (p.is_absolute() || (!p.empty() && (p.native().rfind("./", 0) == 0 || p.native().rfind("../", 0) == 0))) {
+        if (auto src = qjs::detail::readFile(p)) {
+          return qjs::Context::ModuleData{ qjs::detail::toUri(p.generic_string()), std::move(*src) };
+        }
+      }
+    }
+
+    // 2) search in "js" directories
+    std::array<fs::path, 4> paths = {
+      userDir / "js" / (name + ".js"),
+      userDir / "js" / name / "index.js",
+      sharedDir / "js" / (name + ".js"),
+      sharedDir / "js" / name / "index.js"
+    };
+    for (const auto& p: paths) {
+      if (auto src = qjs::detail::readFile(p)) {
+        return qjs::Context::ModuleData{ qjs::detail::toUri(p.generic_string()), std::move(*src) };
+      }
+    }
+
+    return qjs::Context::ModuleData{ std::nullopt, std::nullopt };
+  };
+  ctx->moduleLoader = jsModuleLoader;
+
   const auto userScript = deployer.user_data_dir / "rime.js";
   const auto sharedScript = deployer.shared_data_dir / "rime.js";
 
   try {
     if (fs::exists(userScript)) {
-      LOG(INFO) << "loading user's JavaScript file '" << userScript << "'";
+      LOG(INFO) << "loading user JavaScript file '" << userScript << "'";
       eval_file(userScript.u8string().c_str());
     } else if (fs::exists(sharedScript)) {
       LOG(INFO) << "loading shared JavaScript file '" << sharedScript << "'";
