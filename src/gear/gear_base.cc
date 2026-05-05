@@ -7,9 +7,11 @@ namespace rime {
 
 GearBase::GearBase(const Ticket& ticket, QuickJS* qjs): qjs_(qjs) {
     try {
-        env_ = New<qjs::Value>(qjs->ctx->newObject());
-        (*env_)["nameSpace"] = ticket.name_space;
-        (*env_)["engine"] = ticket.engine;
+        auto env = qjs->ctx->newObject();
+        env["nameSpace"] = ticket.name_space;
+        env["engine"] = ticket.engine;
+        env_ = std::move(env);
+
         an<qjs::Value> handlerPtr;
         try {
             handlerPtr = New<qjs::Value>(qjs->ctx->eval(ticket.name_space));
@@ -19,7 +21,7 @@ GearBase::GearBase(const Ticket& ticket, QuickJS* qjs): qjs_(qjs) {
         }
         auto& handler = *handlerPtr;
         if (JS_IsFunction(qjs->ctx->ctx, handler.v)) {
-            exec_ = New<qjs::Value>(std::move(handler));
+            exec_ = std::move(handler);
         } else {
             qjs::Value init = handler["init"];
             if (JS_IsFunction(qjs->ctx->ctx, init.v)) {
@@ -28,12 +30,12 @@ GearBase::GearBase(const Ticket& ticket, QuickJS* qjs): qjs_(qjs) {
 
             qjs::Value exec = handler["exec"];
             if (JS_IsFunction(qjs->ctx->ctx, exec.v)) {
-                exec_ = New<qjs::Value>(std::move(exec));
+                exec_ = std::move(exec);
             }
 
             qjs::Value exit = handler["exit"];
             if (JS_IsFunction(qjs->ctx->ctx, exit.v)) {
-                exit_ = New<qjs::Value>(std::move(exit));
+                exit_ = std::move(exit);
             }
         }
     } catch (const qjs::exception&) {

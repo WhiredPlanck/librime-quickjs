@@ -18,7 +18,7 @@ public:
     virtual bool AppliesToSegment(Segment* segment);
 
 private:
-    an<qjs::Value> tags_match_;
+    std::optional<qjs::Value> tags_match_;
 };
 
 } // namespace rime

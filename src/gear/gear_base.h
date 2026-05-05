@@ -14,9 +14,9 @@ public:
 
 protected:
     QuickJS* qjs_;
-    an<qjs::Value> env_;
-    an<qjs::Value> exec_;
-    an<qjs::Value> exit_;
+    std::optional<qjs::Value> env_;
+    std::optional<qjs::Value> exec_;
+    std::optional<qjs::Value> exit_;
 };
 
 } // namespace rime
