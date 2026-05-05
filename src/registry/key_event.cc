@@ -5,17 +5,12 @@
 namespace rime {
 namespace quickjs {
 
-struct KeyEventAlias {
-    static int getKeycode(KeyEvent * ke) { return ke->keycode(); }
-    static int getModifier(KeyEvent * ke) { return ke->modifier(); }
-};
-
 void registerKeyEvent(Module &module) {
     module.class_<KeyEvent>("KeyEvent")
         .constructor<>()
         .constructor<int, int>()
-        .property<&KeyEventAlias::getKeycode>("keycode")
-        .property<&KeyEventAlias::getModifier>("modifier")
+        .property<constOverload<>(&KeyEvent::keycode), overload<int>(&KeyEvent::keycode)>("keycode")
+        .property<constOverload<>(&KeyEvent::modifier), overload<int>(&KeyEvent::modifier)>("modifier")
         .fun<&KeyEvent::shift>("shift")
         .fun<&KeyEvent::ctrl>("ctrl")
         .fun<&KeyEvent::alt>("alt")

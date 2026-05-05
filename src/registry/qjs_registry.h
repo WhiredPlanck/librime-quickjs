@@ -1,5 +1,6 @@
 #pragma once
 
+#include "lib/overload.hpp"
 #include "lib/qjs_traits.hpp"
 
 using Module = qjs::Context::Module;

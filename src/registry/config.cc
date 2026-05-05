@@ -6,72 +6,27 @@
 namespace rime {
 namespace quickjs {
 
-#define GETTER_ALIAS(R, N, F) \
-static std::optional<R> N(Config * c, const string& path) { \
-    R value;                                              \
-    if (c->F(path, &value)) {                             \
-        return value;                                     \
-    } else {                                              \
-        return std::nullopt;                              \
-    }                                                     \
+template<typename T>
+auto makeConfigGetter(bool (Config::*method)(const string&, T*)) {
+    return [method](Config* c, const std::string& path) -> std::optional<T> {
+        T val;
+        if ((c->*method)(path, &val)) {
+            return val;
+        }
+        return std::nullopt;
+    };
 }
 
-#define GETTER_ALIAS2(R, N, F) \
-static std::optional<R> N(ConfigValue * v) { \
-    R value;                                              \
-    if (v->F(&value)) {                                  \
-        return value;                                     \
-    } else {                                              \
-        return std::nullopt;                              \
-    }                                                     \
+template<typename T>
+auto makeConfigValueGetter(bool (ConfigValue::*method)(T*) const) {
+    return [method](ConfigValue* v) -> std::optional<T> {
+        T val;
+        if ((v->*method)(&val)) {
+            return val;
+        }
+        return std::nullopt;
+    };
 }
-
-struct ConfigAlias {
-    GETTER_ALIAS(bool, getBool, GetBool)
-    GETTER_ALIAS(int, getInt, GetInt)
-    GETTER_ALIAS(double, getDouble, GetDouble)
-    GETTER_ALIAS(string, getString, GetString)
-
-    static an<ConfigItem> getItem(Config * config, const string& path) {
-        return config->GetItem(path);
-    }
-};
-
-struct ConfigItemAlias {
-    static string type(ConfigItem * item) {
-        switch (item->type()) {
-            case ConfigItem::kNull: return "kNull";
-            case ConfigItem::kScalar: return "kScalar";
-            case ConfigItem::kList: return "kList";
-            case ConfigItem::kMap: return "kMap";
-        }
-    }
-};
-
-struct ConfigValueAlias {
-    GETTER_ALIAS2(bool, getBool, GetBool)
-    GETTER_ALIAS2(int, getInt, GetInt)
-    GETTER_ALIAS2(double, getDouble, GetDouble)
-    GETTER_ALIAS2(string, getString, GetString)
-};
-
-struct ConfigMapAlias {
-    static size_t size(ConfigMap * m) {
-        size_t count = 0;
-        for (auto it : *m) {
-            ++count;
-        }
-        return count;
-    }
-
-    static vector<string> keys(ConfigMap * m) {
-        vector<string> keys;
-        for (auto [k, _] : *m) {
-            keys.emplace_back(k);
-        }
-        return std::move(keys);
-    }
-};
 
 void registerConfig(Module& module) {
     module.class_<Config>("Config")
@@ -79,25 +34,27 @@ void registerConfig(Module& module) {
         .fun<&Config::IsValue>("isValue")
         .fun<&Config::IsList>("isList")
         .fun<&Config::IsMap>("isMap")
-        .fun<&ConfigAlias::getBool>("getBool")
-        .fun<&ConfigAlias::getInt>("getInt")
-        .fun<&ConfigAlias::getDouble>("getDouble")
-        .fun<&ConfigAlias::getString>("getString")
-        .fun<&ConfigAlias::getItem>("getItem")
+        .fun("getBool", makeConfigGetter(&Config::GetBool))
+        .fun("getInt", makeConfigGetter(&Config::GetInt))
+        .fun("getDouble", makeConfigGetter(&Config::GetDouble))
+        .fun("getString", makeConfigGetter(&Config::GetString))
+        .fun("getItem", [](Config * config, const string& path) {
+            return config->GetItem(path);
+        })
         .fun<&Config::GetValue>("getValue")
         .fun<&Config::GetList>("getList")
         .fun<&Config::GetMap>("getMap")
         .fun<&Config::GetListSize>("getListSize");
 
     module.class_<ConfigItem>("ConfigItem")
-        .property<&ConfigItemAlias::type>("type");
+        .property<&ConfigItem::type>("type");
     
     module.class_<ConfigValue>("ConfigValue")
         .base<ConfigItem>()
-        .fun<&ConfigValueAlias::getBool>("getBool")
-        .fun<&ConfigValueAlias::getInt>("getInt")
-        .fun<&ConfigValueAlias::getDouble>("getDouble")
-        .fun<&ConfigValueAlias::getString>("getString");
+        .fun("getBool", makeConfigValueGetter(&ConfigValue::GetBool))
+        .fun("getInt", makeConfigValueGetter(&ConfigValue::GetInt))
+        .fun("getDouble", makeConfigValueGetter(&ConfigValue::GetDouble))
+        .fun("getString", makeConfigValueGetter(&ConfigValue::GetString));
 
     module.class_<ConfigList>("ConfigList")
         .base<ConfigItem>()
@@ -112,8 +69,13 @@ void registerConfig(Module& module) {
         .fun<&ConfigMap::GetValue>("getValue")
         .fun<&ConfigMap::HasKey>("hasKey")
         .fun<&ConfigMap::empty>("empty")
-        .fun<&ConfigMapAlias::size>("size")
-        .fun<&ConfigMapAlias::keys>("keys");
+        .fun("keys", [](ConfigMap * m) {
+            vector<string> keys;
+            for (const auto& pair : *m) {
+                keys.emplace_back(pair.first);
+            }   
+            return keys;
+        });
 }
 
 }
