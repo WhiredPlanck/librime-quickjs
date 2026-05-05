@@ -11,7 +11,7 @@ an<Translation> QuickJSTranslator::Query(const string& input, const Segment& seg
     if (!exec_) return an<QuickJSTranslation>();
     auto generatorFunc = ((std::function<qjs::Value(const qjs::Value&, const string&, an<Segment>)>) *exec_);
     auto generator = generatorFunc(*env_, input, New<Segment>(segment));
-    auto translation = New<QuickJSTranslation>(qjs_, New<qjs::Value>(std::move(generator)));
+    auto translation = New<QuickJSTranslation>(qjs_, generator);
     if (translation->exhausted()) {
         return an<QuickJSTranslation>();
     } else {

@@ -8,7 +8,7 @@ namespace rime {
 
 class QuickJSTranslation: public Translation {
 public:
-    QuickJSTranslation(QuickJS* qjs, an<qjs::Value> generator);
+    QuickJSTranslation(QuickJS* qjs, qjs::Value generator);
     virtual ~QuickJSTranslation();
 
     bool Next();
@@ -17,7 +17,7 @@ public:
 private:
     QuickJS* qjs_;
     an<Candidate> candidate_;
-    an<qjs::Value> generator_;
+    qjs::Value generator_;
 };
 
 } // namespace rime

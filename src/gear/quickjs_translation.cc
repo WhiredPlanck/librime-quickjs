@@ -5,8 +5,8 @@
 
 namespace rime {
 
-QuickJSTranslation::QuickJSTranslation(QuickJS* qjs, an<qjs::Value> generator)
-    : qjs_(qjs), generator_(generator) {
+QuickJSTranslation::QuickJSTranslation(QuickJS* qjs, qjs::Value generator)
+    : qjs_(qjs), generator_(std::move(generator)) {
         Next();
     }
 
@@ -15,7 +15,7 @@ QuickJSTranslation::~QuickJSTranslation() {}
 bool QuickJSTranslation::Next() {
     if (exhausted()) return false;
     try {
-        qjs::Value res = generator_->callMember("next");
+        qjs::Value res = generator_.callMember("next");
         qjs::Value value = res["value"];
         auto done = (bool) res["done"];
         if (done || JS_IsUndefined(value.v)) {
