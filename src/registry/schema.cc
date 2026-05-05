@@ -9,7 +9,7 @@ void registerSchema(Module& module) {
     module.class_<Schema>("Schema")
         .property<&Schema::schema_id>("schemaId")
         .property<&Schema::schema_name>("schemaName")
-        .fun<&Schema::config>("config");
+        .property<&Schema::config>("config");
 }
 
 }

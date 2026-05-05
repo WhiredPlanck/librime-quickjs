@@ -8,7 +8,7 @@ namespace quickjs {
 
 void registerEngine(Module &module) {
     module.class_<Engine>("Engine")
-        .fun<&Engine::schema>("schema")
+        .property<&Engine::schema>("schema")
         .fun<&Engine::CommitText>("commitText");
 }
 

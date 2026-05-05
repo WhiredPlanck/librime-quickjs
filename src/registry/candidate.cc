@@ -19,7 +19,9 @@ void registerCandidate(Module& module) {
         .property<&Candidate::start, &Candidate::set_start>("start")
         .property<&Candidate::end, &Candidate::set_end>("end")
         .property<&Candidate::quality, &Candidate::set_quality>("quality")
-        .property<&Candidate::text>("text");
+        .property<&Candidate::text>("text")
+        .property<&Candidate::comment>("comment")
+        .property<&Candidate::preedit>("preedit");
         // .static_fun<&getGenuineCandidate>("getGenuineCandidate")
         // .static_fun<&getGenuineCandidates>("getGenuineCandidates");
     module.class_<SimpleCandidate>("SimpleCandidate")
@@ -36,18 +38,12 @@ void registerCandidate(Module& module) {
         .constructor<const an<Candidate>&, const string&, const string&, const string&>()
         .constructor<const an<Candidate>&, const string&, const string&>()
         .constructor<const an<Candidate>&, const string&>()
-        .property<&ShadowCandidate::text>("text")
-        .property<&ShadowCandidate::comment>("comment")
-        .property<&ShadowCandidate::preedit>("preedit")
         .property<&ShadowCandidate::item>("item");
     module.class_<UniquifiedCandidate>("UniquifiedCandidate")
         .base<Candidate>()
         .constructor<const an<Candidate>&, const string&, const string&, const string&>()
         .constructor<const an<Candidate>&, const string&, const string&>()
         .constructor<const an<Candidate>&, const string&>()
-        .property<&UniquifiedCandidate::text>("text")
-        .property<&UniquifiedCandidate::comment>("comment")
-        .property<&UniquifiedCandidate::preedit>("preedit")
         .fun<&UniquifiedCandidate::Append>("append");
 }
 
