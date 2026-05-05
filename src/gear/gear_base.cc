@@ -12,33 +12,38 @@ GearBase::GearBase(const Ticket& ticket, QuickJS* qjs): qjs_(qjs) {
         env["engine"] = ticket.engine;
         env_ = std::move(env);
 
+        auto* ctx = qjs->ctx->ctx; 
         auto& ns = qjs->ns;
+        if (JS_IsNull(ns.v)) {
+            auto md = qjs->ctx->moduleLoader(ticket.name_space.c_str());
+            ns = qjs->evalModuleNamespace(*md.source, *md.url);
+        }
         qjs::Value handle = ns[ticket.name_space.c_str()];
-        if (JS_IsFunction(qjs->ctx->ctx, handle.v)) {
+        if (JS_IsFunction(ctx, handle.v)) {
             exec_ = std::move(handle);
         } else {
             qjs::Value init = handle["init"];
-            if (JS_IsFunction(qjs->ctx->ctx, init.v)) {
+            if (JS_IsFunction(ctx, init.v)) {
                 ((std::function<void(const qjs::Value&)>) init)(*env_);
             }
 
             qjs::Value exec = handle["exec"];
-            if (JS_IsFunction(qjs->ctx->ctx, exec.v)) {
+            if (JS_IsFunction(ctx, exec.v)) {
                 exec_ = std::move(exec);
             }
 
             qjs::Value exit = handle["exit"];
-            if (JS_IsFunction(qjs->ctx->ctx, exit.v)) {
+            if (JS_IsFunction(ctx, exit.v)) {
                 exit_ = std::move(exit);
             }
         }
     } catch (const qjs::exception&) {
-        const auto& e = qjs->ctx->getException();
+        auto e = qjs->ctx->getException();
         LOG(ERROR) << "QuickJS component initialize error("
             << "module: " << ticket.klass 
             << ", name_space: " << ticket.name_space
-            << "): " << (string) e;
-        }
+            << "): " << (string) e << (string) e["stack"];
+    }
 }
 
 GearBase::~GearBase() {

@@ -40,6 +40,8 @@ public:
 
     QuickJS();
     ~QuickJS();
+
+    qjs::Value evalModuleNamespace(std::string_view source, std::string_view filename);
 };
 
 extern QuickJS *GlobalEngine;

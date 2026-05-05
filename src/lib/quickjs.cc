@@ -24,6 +24,21 @@ QuickJS::QuickJS(): rt(new qjs::Runtime), ns(JS_NULL) {
     js_std_loop(ctx->ctx);
 }
 
+qjs::Value QuickJS::evalModuleNamespace(std::string_view source, std::string_view filename) {
+    int evalFlags = JS_EVAL_TYPE_MODULE | JS_EVAL_FLAG_COMPILE_ONLY;
+    auto func = ctx->eval(source, filename.data(), evalFlags);
+    if (JS_ResolveModule(ctx->ctx, func.v) < 0) {
+        throw qjs::exception{ctx->ctx};
+    }
+    JSValue ret = JS_EvalFunction(ctx->ctx, func.v);
+    if (JS_IsException(ret)) throw qjs::exception{ctx->ctx};
+    JS_FreeValue(ctx->ctx, ret);
+            
+    JSValue ns = JS_GetModuleNamespace(ctx->ctx, (JSModuleDef*) JS_VALUE_GET_PTR(func.v));
+    if (JS_IsException(ns)) throw qjs::exception{ctx->ctx};
+    return qjs::Value{ctx->ctx, std::move(ns)};
+}
+
 QuickJS::~QuickJS() {
     js_std_free_handlers(rt->rt);
 }
