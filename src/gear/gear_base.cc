@@ -5,7 +5,7 @@
 
 namespace rime {
 
-GearBase::GearBase(const Ticket& ticket, an<QuickJS> qjs): qjs_(qjs) {
+GearBase::GearBase(const Ticket& ticket, QuickJS* qjs): qjs_(qjs) {
     try {
         env_ = New<qjs::Value>(qjs->ctx->newObject());
         (*env_)["nameSpace"] = ticket.name_space;

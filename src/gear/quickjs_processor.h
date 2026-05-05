@@ -11,7 +11,7 @@ namespace rime {
 
 class QuickJSProcessor : public Processor, GearBase {
 public:
-    QuickJSProcessor(const Ticket& ticket, an<QuickJS> qjs);
+    QuickJSProcessor(const Ticket& ticket, QuickJS* qjs);
     virtual ~QuickJSProcessor() = default;
 
     ProcessResult ProcessKeyEvent(const KeyEvent& key_event) override;
@@ -21,15 +21,12 @@ public:
 template<typename C>
 class QuickJSComponent : public C::Component {
 public:
-    explicit QuickJSComponent(an<QuickJS> qjs): qjs_(qjs) {};
+    explicit QuickJSComponent() {};
     virtual ~QuickJSComponent() {};
 
     C* Create(const Ticket& ticket) {
-        return new C(ticket, qjs_);
+        return new C(ticket, GlobalEngine);
     }
-
-protected:
-    an<QuickJS> qjs_;
 };
 
 }

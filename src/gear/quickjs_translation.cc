@@ -5,7 +5,7 @@
 
 namespace rime {
 
-QuickJSTranslation::QuickJSTranslation(an<QuickJS> qjs, an<qjs::Value> generator)
+QuickJSTranslation::QuickJSTranslation(QuickJS* qjs, an<qjs::Value> generator)
     : qjs_(qjs), generator_(generator) {
         Next();
     }

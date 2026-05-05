@@ -5,8 +5,6 @@
 #include <rime/common.h>
 #include <string_view>
 
-using namespace qjs;
-
 static JSContext *JS_NewCustomContext(JSRuntime *rt) {
     JSContext *ctx;
     ctx = JS_NewContext(rt);
@@ -36,9 +34,11 @@ inline void JS_AddExtraHelper(qjs::Context* ctx) {
 
 class QuickJS {
 public:
-    std::unique_ptr<Runtime> rt;
-    std::unique_ptr<Context> ctx;
+    std::unique_ptr<qjs::Runtime> rt;
+    std::unique_ptr<qjs::Context> ctx;
 
     QuickJS();
     ~QuickJS();
 };
+
+extern QuickJS *GlobalEngine;

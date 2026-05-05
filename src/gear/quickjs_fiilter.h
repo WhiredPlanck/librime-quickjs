@@ -11,7 +11,7 @@ namespace rime {
 
 class QuickJSFilter: public Filter, TagMatching, GearBase {
 public:
-    QuickJSFilter(const Ticket& ticket, an<QuickJS> qjs);
+    QuickJSFilter(const Ticket& ticket, QuickJS* qjs);
     virtual ~QuickJSFilter() = default;
 
     virtual an<Translation> Apply(an<Translation> translation, CandidateList* candidates);
