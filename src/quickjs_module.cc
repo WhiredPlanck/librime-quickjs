@@ -18,19 +18,7 @@ QuickJS *GlobalEngine;
 
 static qjs::Value eval_file(const char* filename) {
   auto buffer = qjs::detail::readFile(filename);
-  int evalFlags = JS_EVAL_TYPE_MODULE | JS_EVAL_FLAG_COMPILE_ONLY;
-  auto func = GlobalEngine->ctx->eval(*buffer, filename, evalFlags);
-  auto ctx = GlobalEngine->ctx->ctx;
-  if (JS_ResolveModule(ctx, func.v) < 0) {
-    throw qjs::exception{ctx};
-  }
-  JSValue ret = JS_EvalFunction(ctx, func.v);
-  if (JS_IsException(ret)) throw qjs::exception{ctx};
-  JS_FreeValue(ctx, ret);
-
-  JSValue ns = JS_GetModuleNamespace(ctx, (JSModuleDef*) JS_VALUE_GET_PTR(func.v));
-  if (JS_IsException(ns)) throw qjs::exception{ctx};
-  return qjs::Value{ctx, std::move(ns)};
+  return GlobalEngine->evalModuleNamespace(*buffer, filename);
 }
 
 static void quickjs_initialize() {
