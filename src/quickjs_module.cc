@@ -14,15 +14,18 @@ using namespace rime;
 
 namespace fs = std::filesystem;
 
-static qjs::Value eval_file(qjs::Context* ctx, const char* filename) {
+QuickJS *GlobalEngine;
+
+static qjs::Value eval_file(const char* filename) {
   auto buffer = qjs::detail::readFile(filename);
   int module = JS_DetectModule(buffer->data(), buffer->size());
   int eval_flags = module ? JS_EVAL_TYPE_MODULE : JS_EVAL_TYPE_GLOBAL;
   LOG(INFO) << "eval_flags: " << eval_flags;
-  return ctx->eval(*buffer, filename, eval_flags);
+  return GlobalEngine->ctx->eval(*buffer, filename, eval_flags);
 }
 
-static void quickjs_initialize(qjs::Context* ctx) {
+static void quickjs_initialize() {
+  auto ctx = GlobalEngine->ctx.get();
   rime::quickjs::initializeRegistries(ctx);
 
   auto &deployer(Service::instance().deployer());
@@ -32,10 +35,10 @@ static void quickjs_initialize(qjs::Context* ctx) {
   try {
     if (fs::exists(userScript)) {
       LOG(INFO) << "loading user's JavaScript file '" << userScript << "'";
-      eval_file(ctx, userScript.u8string().c_str());
+      eval_file(userScript.u8string().c_str());
     } else if (fs::exists(sharedScript)) {
       LOG(INFO) << "loading shared JavaScript file '" << sharedScript << "'";
-      eval_file(ctx, sharedScript.u8string().c_str());
+      eval_file(sharedScript.u8string().c_str());
     }
   } catch (const qjs::exception&) {
     const auto &e = ctx->getException();
@@ -47,13 +50,13 @@ static void rime_quickjs_initialize() {
   LOG(INFO) << "registering components from module 'quickjs'.";
   Registry &r = Registry::instance();
 
-  an<QuickJS> qjs(new QuickJS);
-  quickjs_initialize(qjs->ctx.get());
+  GlobalEngine = new QuickJS;
+  quickjs_initialize();
 
-  r.Register("qjs_processor", new QuickJSComponent<QuickJSProcessor>(qjs));
-  r.Register("qjs_translator", new QuickJSComponent<QuickJSTranslator>(qjs));
-  r.Register("qjs_segmentor", new QuickJSComponent<QuickJSSegmentor>(qjs));
-  r.Register("qjs_filter", new QuickJSComponent<QuickJSFilter>(qjs));
+  r.Register("qjs_processor", new QuickJSComponent<QuickJSProcessor>());
+  r.Register("qjs_translator", new QuickJSComponent<QuickJSTranslator>());
+  r.Register("qjs_segmentor", new QuickJSComponent<QuickJSSegmentor>());
+  r.Register("qjs_filter", new QuickJSComponent<QuickJSFilter>());
 }
 
 static void rime_quickjs_finalize() {

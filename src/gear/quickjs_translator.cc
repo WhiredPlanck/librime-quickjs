@@ -4,7 +4,7 @@
 
 namespace rime {
 
-QuickJSTranslator::QuickJSTranslator(const Ticket& ticket, an<QuickJS> qjs)
+QuickJSTranslator::QuickJSTranslator(const Ticket& ticket, QuickJS* qjs)
     : Translator(ticket), GearBase(ticket, qjs) {};
 
 an<Translation> QuickJSTranslator::Query(const string& input, const Segment& segment) {

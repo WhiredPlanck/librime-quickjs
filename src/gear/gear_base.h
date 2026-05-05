@@ -9,11 +9,11 @@ namespace rime {
 
 class GearBase {
 public:
-    GearBase(const Ticket& ticket, an<QuickJS>);
+    GearBase(const Ticket& ticket, QuickJS* qjs);
     ~GearBase();
 
 protected:
-    an<QuickJS> qjs_;
+    QuickJS* qjs_;
     an<qjs::Value> env_;
     an<qjs::Value> exec_;
     an<qjs::Value> exit_;

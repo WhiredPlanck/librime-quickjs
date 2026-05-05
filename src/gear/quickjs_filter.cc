@@ -4,7 +4,7 @@
 
 namespace rime {
 
-QuickJSFilter::QuickJSFilter(const Ticket& ticket, an<QuickJS> qjs)
+QuickJSFilter::QuickJSFilter(const Ticket& ticket, QuickJS* qjs)
     : Filter(ticket), TagMatching(ticket), GearBase(ticket, qjs) {
     try {
         env_ = New<qjs::Value>(qjs->ctx->newObject());

@@ -4,7 +4,7 @@
 
 namespace rime {
 
-QuickJSProcessor::QuickJSProcessor(const Ticket& ticket, an<QuickJS> qjs)
+QuickJSProcessor::QuickJSProcessor(const Ticket& ticket, QuickJS* qjs)
     : Processor(ticket), GearBase(ticket, qjs) {};
 
 ProcessResult QuickJSProcessor::ProcessKeyEvent(const KeyEvent& key_event) {
