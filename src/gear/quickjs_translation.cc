@@ -22,11 +22,11 @@ bool QuickJSTranslation::Next() {
             set_exhausted(true);
             return false;
         }
-        candidate_ = (an<SimpleCandidate>) value;
+        candidate_ = (an<Candidate>) value;
         return true;
     } catch (const qjs::exception&) {
         auto e = qjs_->ctx->getException();
-        LOG(ERROR) << "QuickJSTranslation::Next error: " << (string) e;
+        LOG(ERROR) << "QuickJSTranslation::Next error: " << (string) e << (string) e["stack"];
         set_exhausted(true);
         return false;
     }

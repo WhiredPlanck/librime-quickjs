@@ -49,10 +49,10 @@ GearBase::GearBase(const Ticket& ticket, QuickJS* qjs): qjs_(qjs) {
 GearBase::~GearBase() {
     if (exit_) {
         try {
-            ((std::function<void(const qjs::Value&)>) *exit_)(*env_);
+            ((std::function<void(qjs::Value)>) *exit_)(*env_);
         } catch (const qjs::exception&) {
-            const auto& e = qjs_->ctx->getException();
-            LOG(ERROR) << "QuickJS component deconstruct error(" << (string) (*env_)["nameSpace"] << "): " << (string) e;
+            auto e = qjs_->ctx->getException();
+            LOG(ERROR) << "QuickJS component deconstruct error(" << (string) (*env_)["nameSpace"] << "): " << (string) e << (string) e["stack"];
         }
     }
 }
