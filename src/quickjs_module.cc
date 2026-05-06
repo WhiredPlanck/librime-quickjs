@@ -18,10 +18,19 @@ QuickJS *GlobalEngine;
 
 static qjs::Value eval_file(const char* filename) {
   auto buffer = qjs::detail::readFile(filename);
-  int module = JS_DetectModule(buffer->data(), buffer->size());
-  int eval_flags = module ? JS_EVAL_TYPE_MODULE : JS_EVAL_TYPE_GLOBAL;
-  LOG(INFO) << "eval_flags: " << eval_flags;
-  return GlobalEngine->ctx->eval(*buffer, filename, eval_flags);
+  int evalFlags = JS_EVAL_TYPE_MODULE | JS_EVAL_FLAG_COMPILE_ONLY;
+  auto func = GlobalEngine->ctx->eval(*buffer, filename, evalFlags);
+  auto ctx = GlobalEngine->ctx->ctx;
+  if (JS_ResolveModule(ctx, func.v) < 0) {
+    throw qjs::exception{ctx};
+  }
+  JSValue ret = JS_EvalFunction(ctx, func.v);
+  if (JS_IsException(ret)) throw qjs::exception{ctx};
+  JS_FreeValue(ctx, ret);
+
+  JSValue ns = JS_GetModuleNamespace(ctx, (JSModuleDef*) JS_VALUE_GET_PTR(func.v));
+  if (JS_IsException(ns)) throw qjs::exception{ctx};
+  return qjs::Value{ctx, std::move(ns)};
 }
 
 static void quickjs_initialize() {
@@ -29,10 +38,7 @@ static void quickjs_initialize() {
   rime::quickjs::initializeRegistries(ctx);
 
   auto &deployer(Service::instance().deployer());
-  const auto userDir = deployer.user_data_dir;
-  const auto sharedDir = deployer.shared_data_dir;
-
-  auto jsModuleLoader = [&userDir, &sharedDir](std::string_view filename) -> qjs::Context::ModuleData {
+  auto jsModuleLoader = [&deployer](std::string_view filename) -> qjs::Context::ModuleData {
     std::string name(filename);
 
     // 1) read directly if absolute / relative paths are used
@@ -46,7 +52,9 @@ static void quickjs_initialize() {
     }
 
     // 2) search in "js" directories
-    std::array<fs::path, 4> paths = {
+    const auto userDir = deployer.user_data_dir;
+    const auto sharedDir = deployer.shared_data_dir;
+    std::array<fs::path, 4> paths {
       userDir / "js" / (name + ".js"),
       userDir / "js" / name / "index.js",
       sharedDir / "js" / (name + ".js"),
@@ -65,18 +73,20 @@ static void quickjs_initialize() {
   const auto userScript = deployer.user_data_dir / "rime.js";
   const auto sharedScript = deployer.shared_data_dir / "rime.js";
 
+  qjs::Value ns(JS_NULL);
   try {
     if (fs::exists(userScript)) {
       LOG(INFO) << "loading user JavaScript file '" << userScript << "'";
-      eval_file(userScript.u8string().c_str());
+      ns = eval_file(userScript.u8string().c_str());
     } else if (fs::exists(sharedScript)) {
       LOG(INFO) << "loading shared JavaScript file '" << sharedScript << "'";
-      eval_file(sharedScript.u8string().c_str());
+      ns = eval_file(sharedScript.u8string().c_str());
     }
   } catch (const qjs::exception&) {
-    const auto &e = ctx->getException();
-    LOG(ERROR) << "failed to load rime.js: " << e.as<string>();
+    auto e = ctx->getException();
+    LOG(ERROR) << "failed to load rime.js: " << (string) e << (string) e["stack"];
   }
+  GlobalEngine->ns = std::move(ns);
 }
 
 static void rime_quickjs_initialize() {
