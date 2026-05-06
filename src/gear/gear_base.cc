@@ -18,23 +18,23 @@ GearBase::GearBase(const Ticket& ticket, QuickJS* qjs): qjs_(qjs) {
             auto md = qjs->ctx->moduleLoader(ticket.name_space.c_str());
             ns = qjs->evalModuleNamespace(*md.source, *md.url);
         }
-        qjs::Value handle = ns[ticket.name_space.c_str()];
-        if (JS_IsFunction(ctx, handle.v)) {
-            exec_ = std::move(handle);
+        qjs::Value value = ns[ticket.name_space.c_str()];
+        if (JS_IsFunction(ctx, value.v)) {
+            handle_ = std::move(value);
         } else {
-            qjs::Value init = handle["init"];
+            qjs::Value init = value["init"];
             if (JS_IsFunction(ctx, init.v)) {
                 ((std::function<void(const qjs::Value&)>) init)(*env_);
             }
 
-            qjs::Value exec = handle["exec"];
-            if (JS_IsFunction(ctx, exec.v)) {
-                exec_ = std::move(exec);
+            qjs::Value handle = value["handle"];
+            if (JS_IsFunction(ctx, handle.v)) {
+                handle_ = std::move(handle);
             }
 
-            qjs::Value exit = handle["exit"];
-            if (JS_IsFunction(ctx, exit.v)) {
-                exit_ = std::move(exit);
+            qjs::Value dispose = value["dispose"];
+            if (JS_IsFunction(ctx, dispose.v)) {
+                dispose_ = std::move(dispose);
             }
         }
     } catch (const qjs::exception&) {
@@ -47,9 +47,9 @@ GearBase::GearBase(const Ticket& ticket, QuickJS* qjs): qjs_(qjs) {
 }
 
 GearBase::~GearBase() {
-    if (exit_) {
+    if (dispose_) {
         try {
-            ((std::function<void(qjs::Value)>) *exit_)(*env_);
+            ((std::function<void(qjs::Value)>) *dispose_)(*env_);
         } catch (const qjs::exception&) {
             auto e = qjs_->ctx->getException();
             LOG(ERROR) << "QuickJS component deconstruct error(" << (string) (*env_)["nameSpace"] << "): " << (string) e << (string) e["stack"];
