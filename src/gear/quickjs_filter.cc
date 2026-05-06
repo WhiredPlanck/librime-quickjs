@@ -25,7 +25,7 @@ QuickJSFilter::QuickJSFilter(const Ticket& ticket, QuickJS* qjs)
 }
 
 an<Translation> QuickJSFilter::Apply(an<Translation> translation, CandidateList* candidates) {
-    auto generator = ((std::function<qjs::Value(an<Translation>, qjs::Value, CandidateList*)>) *exec_)(translation, *env_, candidates);
+    auto generator = ((std::function<qjs::Value(an<Translation>, qjs::Value, CandidateList*)>) *handle_)(translation, *env_, candidates);
     return New<QuickJSTranslation>(qjs_, generator);
 }
 

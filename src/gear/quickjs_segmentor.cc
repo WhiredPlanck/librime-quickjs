@@ -7,8 +7,8 @@ QuickJSSegmentor::QuickJSSegmentor(const Ticket& ticket, QuickJS* qjs)
 
 bool QuickJSSegmentor::Proceed(Segmentation* segmentation) {
     try {
-        if (!exec_) return true;
-        return ((std::function<bool(Segmentation*, qjs::Value)>) *exec_)(segmentation, *env_);
+        if (!handle_) return true;
+        return ((std::function<bool(Segmentation*, qjs::Value)>) *handle_)(segmentation, *env_);
     } catch (const qjs::exception&) {
         auto e = qjs_->ctx->getException();
         LOG(ERROR) << "QuickJSSegmentor::Procced error(" << name_space_ << "): " << (string) e << (string) e["stack"];
