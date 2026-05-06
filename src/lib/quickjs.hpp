@@ -36,6 +36,7 @@ class QuickJS {
 public:
     std::unique_ptr<qjs::Runtime> rt;
     std::unique_ptr<qjs::Context> ctx;
+    qjs::Value ns;
 
     QuickJS();
     ~QuickJS();

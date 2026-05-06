@@ -7,20 +7,20 @@ namespace rime {
 QuickJSFilter::QuickJSFilter(const Ticket& ticket, QuickJS* qjs)
     : Filter(ticket), TagMatching(ticket), GearBase(ticket, qjs) {
     try {
-        auto modules = qjs->ctx->eval("qjsModules");
-        qjs::Value handler = modules[ticket.name_space.c_str()];
-        if (!JS_IsFunction(qjs->ctx->ctx, handler.v)) {
-            qjs::Value tagsMatch = handler["tagsMatch"];
+        auto& ns = qjs->ns;
+        qjs::Value handle = ns[ticket.name_space.c_str()];
+        if (!JS_IsFunction(qjs->ctx->ctx, handle.v)) {
+            qjs::Value tagsMatch = handle["tagsMatch"];
             if (JS_IsFunction(qjs->ctx->ctx, tagsMatch.v)) {
-                tags_match_ = std::move(tagsMatch);
+                tagsMatch_ = std::move(tagsMatch);
             }
         }
     } catch (const qjs::exception&) {
-        const auto& e = qjs->ctx->getException();
+        auto e = qjs->ctx->getException();
         LOG(ERROR) << "QuickJS component initialize error("
             << "module: " << ticket.klass 
             << ", name_space: " << ticket.name_space
-            << "): " << (string) e;
+            << "): " << (string) e << (string) e["stack"];
     }
 }
 
@@ -30,11 +30,11 @@ an<Translation> QuickJSFilter::Apply(an<Translation> translation, CandidateList*
 }
 
 bool QuickJSFilter::AppliesToSegment(Segment* segment) {
-    if (!tags_match_) {
+    if (!tagsMatch_) {
         return TagsMatch(segment);
     }
     try {
-        return ((std::function<bool(const qjs::Value&, Segment*)>) *tags_match_)(*env_, segment);
+        return ((std::function<bool(const qjs::Value&, Segment*)>) *tagsMatch_)(*env_, segment);
     } catch (const qjs::exception&) {
         auto e = qjs_->ctx->getException();
         LOG(ERROR) << "LuaFilter::AppliesToSegment error(" << name_space_ << "): " << (string) e;

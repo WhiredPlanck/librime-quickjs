@@ -12,28 +12,22 @@ GearBase::GearBase(const Ticket& ticket, QuickJS* qjs): qjs_(qjs) {
         env["engine"] = ticket.engine;
         env_ = std::move(env);
 
-        an<qjs::Value> handlerPtr;
-        try {
-            handlerPtr = New<qjs::Value>(qjs->ctx->eval(ticket.name_space));
-        } catch (...) {
-            auto modules = qjs->ctx->eval("qjsModules");
-            handlerPtr = New<qjs::Value>(modules[ticket.name_space.c_str()]);
-        }
-        auto& handler = *handlerPtr;
-        if (JS_IsFunction(qjs->ctx->ctx, handler.v)) {
-            exec_ = std::move(handler);
+        auto& ns = qjs->ns;
+        qjs::Value handle = ns[ticket.name_space.c_str()];
+        if (JS_IsFunction(qjs->ctx->ctx, handle.v)) {
+            exec_ = std::move(handle);
         } else {
-            qjs::Value init = handler["init"];
+            qjs::Value init = handle["init"];
             if (JS_IsFunction(qjs->ctx->ctx, init.v)) {
                 ((std::function<void(const qjs::Value&)>) init)(*env_);
             }
 
-            qjs::Value exec = handler["exec"];
+            qjs::Value exec = handle["exec"];
             if (JS_IsFunction(qjs->ctx->ctx, exec.v)) {
                 exec_ = std::move(exec);
             }
 
-            qjs::Value exit = handler["exit"];
+            qjs::Value exit = handle["exit"];
             if (JS_IsFunction(qjs->ctx->ctx, exit.v)) {
                 exit_ = std::move(exit);
             }

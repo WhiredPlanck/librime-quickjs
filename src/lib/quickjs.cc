@@ -2,7 +2,7 @@
 
 #include "quickjs.hpp"
 
-QuickJS::QuickJS(): rt(new qjs::Runtime) {
+QuickJS::QuickJS(): rt(new qjs::Runtime), ns(JS_NULL) {
     js_std_set_worker_new_context_func(JS_NewCustomContext);
     js_std_init_handlers(rt->rt);
 
