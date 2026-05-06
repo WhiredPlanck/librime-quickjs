@@ -10,16 +10,15 @@ QuickJSProcessor::QuickJSProcessor(const Ticket& ticket, QuickJS* qjs)
 ProcessResult QuickJSProcessor::ProcessKeyEvent(const KeyEvent& key_event) {
     try {
         if (!exec_) return kNoop;
-        auto event = New<KeyEvent>(std::move(key_event));
-        auto res = ((std::function<int(const qjs::Value&, an<KeyEvent>)>) *exec_)(*env_, event);
+        auto res = ((std::function<int(an<KeyEvent>, qjs::Value)>) *exec_)(New<KeyEvent>(key_event), *env_);
         switch (res) {
             case 0: return kRejected;
             case 1: return kAccepted;
             default: return kNoop;
         }
     } catch (const qjs::exception&) {
-        const auto &e = qjs_->ctx->getException();
-        LOG(ERROR) << "QuickJSProcessor::ProcessKeyEvent error(" << name_space_ << "): " << (string) e;
+        auto e = qjs_->ctx->getException();
+        LOG(ERROR) << "QuickJSProcessor::ProcessKeyEvent error(" << name_space_ << "): " << (string) e << (string) e["stack"];
         return kNoop;
     }
 };

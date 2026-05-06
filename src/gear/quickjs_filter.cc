@@ -25,7 +25,7 @@ QuickJSFilter::QuickJSFilter(const Ticket& ticket, QuickJS* qjs)
 }
 
 an<Translation> QuickJSFilter::Apply(an<Translation> translation, CandidateList* candidates) {
-    auto generator = ((std::function<qjs::Value(const qjs::Value&, an<Translation>, CandidateList*)>) *exec_)(*env_, translation, candidates);
+    auto generator = ((std::function<qjs::Value(an<Translation>, qjs::Value, CandidateList*)>) *exec_)(translation, *env_, candidates);
     return New<QuickJSTranslation>(qjs_, generator);
 }
 
@@ -34,7 +34,7 @@ bool QuickJSFilter::AppliesToSegment(Segment* segment) {
         return TagsMatch(segment);
     }
     try {
-        return ((std::function<bool(const qjs::Value&, Segment*)>) *tagsMatch_)(*env_, segment);
+        return ((std::function<bool(Segment*, qjs::Value)>) *tagsMatch_)(segment, *env_);
     } catch (const qjs::exception&) {
         auto e = qjs_->ctx->getException();
         LOG(ERROR) << "LuaFilter::AppliesToSegment error(" << name_space_ << "): " << (string) e;
