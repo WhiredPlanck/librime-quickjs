@@ -18,7 +18,7 @@ bool QuickJSTranslation::Next() {
         qjs::Value res = generator_.callMember("next");
         qjs::Value value = res["value"];
         auto done = (bool) res["done"];
-        if (done || JS_IsUndefined(value.v)) {
+        if (done || value.isUndefined()) {
             set_exhausted(true);
             return false;
         }

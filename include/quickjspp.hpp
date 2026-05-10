@@ -1320,6 +1320,16 @@ public:
     }
 
     bool isError() const { return JS_IsError(ctx, v); }
+    bool isUndefined() const noexcept { return JS_IsUndefined(v); }
+    bool isNull()      const noexcept { return JS_IsNull(v); }
+    bool isBool()      const noexcept { return JS_IsBool(v); }
+    bool isNumber()    const noexcept { return JS_IsNumber(v); }
+    bool isString()    const noexcept { return JS_IsString(v); }
+    bool isObject()    const noexcept { return JS_IsObject(v); }
+    bool isArray()     const noexcept { return ctx && JS_IsArray(ctx, v); }
+    bool isFunction()  const noexcept { return ctx && JS_IsFunction(ctx, v); }
+    bool isException() const noexcept { return JS_IsException(v); }
+    bool isSymbol()    const noexcept { return JS_IsSymbol(v); }
 
     /** Conversion helper function: value.as<T>()
      * @tparam T type to convert to
