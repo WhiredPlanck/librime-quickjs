@@ -10,7 +10,7 @@ QuickJSProcessor::QuickJSProcessor(const Ticket& ticket, QuickJS* qjs)
 ProcessResult QuickJSProcessor::ProcessKeyEvent(const KeyEvent& key_event) {
     try {
         if (!handle_) return kNoop;
-        auto res = handle_->call<int>(New<KeyEvent>(key_event), *env_);
+        auto res = handle_->call<int>(key_event, *env_);
         switch (res) {
             case 0: return kRejected;
             case 1: return kAccepted;
