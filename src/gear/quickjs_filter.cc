@@ -9,9 +9,9 @@ QuickJSFilter::QuickJSFilter(const Ticket& ticket, QuickJS* qjs)
     try {
         auto& ns = qjs->ns;
         qjs::Value handle = ns[ticket.name_space.c_str()];
-        if (!JS_IsFunction(qjs->ctx->ctx, handle.v)) {
+        if (!handle.isFunction()) {
             qjs::Value tagsMatch = handle["tagsMatch"];
-            if (JS_IsFunction(qjs->ctx->ctx, tagsMatch.v)) {
+            if (tagsMatch.isFunction()) {
                 tagsMatch_ = std::move(tagsMatch);
             }
         }

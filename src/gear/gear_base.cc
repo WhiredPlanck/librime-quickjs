@@ -12,28 +12,27 @@ GearBase::GearBase(const Ticket& ticket, QuickJS* qjs): qjs_(qjs) {
         env["engine"] = ticket.engine;
         env_ = std::move(env);
 
-        auto* ctx = qjs->ctx->ctx; 
         auto& ns = qjs->ns;
-        if (JS_IsNull(ns.v)) {
+        if (ns.isNull()) {
             auto md = qjs->ctx->moduleLoader(ticket.name_space.c_str());
             ns = qjs->evalModuleNamespace(*md.source, *md.url);
         }
         qjs::Value value = ns[ticket.name_space.c_str()];
-        if (JS_IsFunction(ctx, value.v)) {
+        if (value.isFunction()) {
             handle_ = std::move(value);
         } else {
             qjs::Value init = value["init"];
-            if (JS_IsFunction(ctx, init.v)) {
+            if (init.isFunction()) {
                 ((std::function<void(const qjs::Value&)>) init)(*env_);
             }
 
             qjs::Value handle = value["handle"];
-            if (JS_IsFunction(ctx, handle.v)) {
+            if (handle.isFunction()) {
                 handle_ = std::move(handle);
             }
 
             qjs::Value dispose = value["dispose"];
-            if (JS_IsFunction(ctx, dispose.v)) {
+            if (dispose.isFunction()) {
                 dispose_ = std::move(dispose);
             }
         }
