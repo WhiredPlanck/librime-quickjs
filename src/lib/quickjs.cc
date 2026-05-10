@@ -11,7 +11,6 @@ QuickJS::QuickJS(): rt(new qjs::Runtime), ns(JS_NULL) {
     ctx = std::make_unique<qjs::Context>(JS_NewCustomContext(rt->rt));
 
     js_std_add_helpers(ctx->ctx, 0, NULL);
-    JS_AddExtraHelper(ctx.get());
 
     /* make 'std' and 'os' visible to non module code */
     ctx->eval(R"xxx(
