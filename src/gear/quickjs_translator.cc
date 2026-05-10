@@ -9,8 +9,7 @@ QuickJSTranslator::QuickJSTranslator(const Ticket& ticket, QuickJS* qjs)
 
 an<Translation> QuickJSTranslator::Query(const string& input, const Segment& segment) {
     if (!handle_) return an<QuickJSTranslation>();
-    auto generatorFunc = ((std::function<qjs::Value(const string&, an<Segment>, qjs::Value)>) *handle_);
-    auto generator = generatorFunc(input, New<Segment>(segment), *env_);
+    auto generator = handle_->call<qjs::Value>(input, New<Segment>(segment), *env_);
     auto translation = New<QuickJSTranslation>(qjs_, generator);
     if (translation->exhausted()) {
         return an<QuickJSTranslation>();

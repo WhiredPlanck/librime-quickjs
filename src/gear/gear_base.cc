@@ -23,7 +23,7 @@ GearBase::GearBase(const Ticket& ticket, QuickJS* qjs): qjs_(qjs) {
         } else {
             qjs::Value init = value["init"];
             if (init.isFunction()) {
-                ((std::function<void(const qjs::Value&)>) init)(*env_);
+                init.call(*env_);
             }
 
             qjs::Value handle = value["handle"];
@@ -48,7 +48,7 @@ GearBase::GearBase(const Ticket& ticket, QuickJS* qjs): qjs_(qjs) {
 GearBase::~GearBase() {
     if (dispose_) {
         try {
-            ((std::function<void(qjs::Value)>) *dispose_)(*env_);
+            dispose_->call(*env_);
         } catch (const qjs::exception&) {
             auto e = qjs_->ctx->getException();
             LOG(ERROR) << "QuickJS component deconstruct error(" << (string) (*env_)["nameSpace"] << "): " << (string) e << (string) e["stack"];

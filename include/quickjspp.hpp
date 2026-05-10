@@ -1454,14 +1454,37 @@ public:
         return Value{ctx, JS_EvalThis(ctx, v, buffer.data(), buffer.size(), filename, flags)};
     }
 
-    Value call(const Value& func_obj) {
+    template <typename R = void, typename... Args>
+    R call(Args&&... args) const {
+        return callThis<R, Args...>(Value{JS_UNDEFINED}, std::forward<Args>(args)...);
+    }
+
+    template <typename R = void, typename... Args>
+    R callThis(const Value& this_obj, Args&&... args) const {
         assert(ctx);
-        return Value{ctx, JS_Call(ctx, func_obj.v, v, 0, nullptr)};
+        const size_t argc = sizeof...(args);
+        if constexpr(argc == 0) {
+            JSValue result = JS_Call(ctx, v, this_obj.v, 0, nullptr);
+            if (JS_IsException(v)) {
+                throw exception{ctx};
+            }
+            return detail::unwrap_free<R>(ctx, result);
+        } else {
+            std::array<JSValue, argc> argv;
+            detail::wrap_args(ctx, argv.data(), std::forward<Args>(args)...);
+            JSValue result = JS_Call(ctx, v, this_obj.v, argc, argv.data());
+            for (auto& arg: argv) { JS_FreeValue(ctx, arg); }
+            if (JS_IsException(result)) {
+                throw exception{ctx};
+            }
+            return detail::unwrap_free<R>(ctx, result);
+        }
     }
 
     Value callMember(std::string_view name) {
         assert(ctx);
-        return call((*this)[name.data()]);
+        Value func_obj = (*this)[name.data()];
+        return func_obj.callThis<Value>(*this);
     }
 
 };
