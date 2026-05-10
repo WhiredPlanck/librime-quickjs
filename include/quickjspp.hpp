@@ -62,18 +62,26 @@ shared_ptr<T> make_shared(JSContext *, Args&&... args)
 template <typename R, typename /*_SFINAE*/ = void>
 struct js_traits
 {
+    using T = std::remove_cv_t<std::remove_reference_t<R>>;
+
     /** Create an object of C++ type R given JSValue v and JSContext.
      * This function is intentionally not implemented. User should implement this function for their own type.
      * @param v This value is passed as JSValueConst so it should be freed by the caller.
      * @throws exception in case of conversion error
      */
-    static R unwrap(JSContext * ctx, JSValueConst v) = delete;
+    static R unwrap(JSContext * ctx, JSValueConst v)
+    {
+        return *js_traits<T*>::unwrap(ctx, v);
+    }
 
     /** Create JSValue from an object of type R and JSContext.
      * This function is intentionally not implemented. User should implement this function for their own type.
      * @return Returns JSValue which should be freed by the caller or JS_EXCEPTION in case of error.
      */
-    static JSValue wrap(JSContext * ctx, R value) = delete;
+    static JSValue wrap(JSContext * ctx, const R& value)
+    {
+        return js_traits<T*>::wrap(ctx, const_cast<T*>(std::addressof(value)));
+    }
 };
 
 /** Conversion traits for JSValue (identity).
