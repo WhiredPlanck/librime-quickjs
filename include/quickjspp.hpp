@@ -1384,7 +1384,7 @@ public:
     std::enable_if_t<std::is_member_function_pointer_v<decltype(F)> || std::is_function_v<std::remove_pointer_t<decltype(F)>>, Value&>
     add(const char * name)
     {
-        (*this)[name] = fwrapper<F>{name};
+        (*this)[name] = fwrapper<F, true>{name};
         return *this;
     }
 
