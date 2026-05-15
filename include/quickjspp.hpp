@@ -1776,6 +1776,45 @@ public:
             }
         };
 
+        template <typename T>
+        class object_registrar
+        {
+            const char * name;
+            qjs::Value prototype;
+            qjs::Context::Module& module;
+            qjs::Context& context;
+        public:
+            explicit object_registrar(const char* name, qjs::Context::Module& module, qjs::Context& context) :
+                name(name),
+                prototype(context.newObject()),
+                module(module),
+                context(context)
+            {
+            }
+
+            template <typename F>
+            object_registrar& fun(const char * name, F&& f)
+            {
+                prototype[name] = std::forward<F>(f);
+                return *this;
+            }
+
+            template <auto FGet, auto FSet = nullptr>
+            object_registrar& property(const char * name)
+            {
+                if constexpr (std::is_same_v<decltype(FSet), std::nullptr_t>)
+                    prototype.add_getter<FGet>(name);
+                else
+                    prototype.add_getter_setter<FGet, FSet>(name);
+                return *this;
+            }
+
+            ~object_registrar()
+            {
+                module.add(name, std::move(prototype));
+            }
+        };
+
     public:
         /** Add class to module.
          * See \ref class_registrar.
@@ -1786,6 +1825,11 @@ public:
             return class_registrar<T>{name, *this, qjs::Context::get(ctx)};
         }
 
+        template <class T>
+        object_registrar<T> object(const char * name)
+        {
+            return object_registrar<T>{name, *this, qjs::Context::get(ctx)};
+        }
     };
 
     std::vector<Module> modules;
