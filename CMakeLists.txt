@@ -3,9 +3,11 @@ project(rime-quickjs)
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 
-include(QuickJS)
-
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+option(QJS_ENABLE_INSTALL "" OFF)
+option(QJS_BUILD_LIBC "" ON)
+add_subdirectory(deps/quickjs-ng)
 
 aux_source_directory(src quickjs_src)
 aux_source_directory(src/lib quickjs_lib)
@@ -14,7 +16,7 @@ aux_source_directory(src/extend quickjs_extend)
 aux_source_directory(src/registry quickjs_registry)
 
 add_library(rime-quickjs-objs OBJECT ${quickjs_src} ${quickjs_lib} ${quickjs_gear} ${quickjs_extend} ${quickjs_registry})
-target_link_libraries(rime-quickjs-objs PRIVATE QuickJS::QuickJS)
+target_link_libraries(rime-quickjs-objs PRIVATE qjs)
 target_include_directories(rime-quickjs-objs PRIVATE
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
 )
@@ -25,7 +27,7 @@ if(BUILD_SHARED_LIBS)
 endif()
 
 add_library(rime-quickjs-deps INTERFACE)
-target_link_libraries(rime-quickjs-deps INTERFACE QuickJS::QuickJS)
+target_link_libraries(rime-quickjs-deps INTERFACE qjs)
 
 set(plugin_name rime-quickjs PARENT_SCOPE)
 set(plugin_objs $<TARGET_OBJECTS:rime-quickjs-objs> PARENT_SCOPE)

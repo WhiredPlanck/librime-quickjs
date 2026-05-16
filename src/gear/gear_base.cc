@@ -15,7 +15,7 @@ GearBase::GearBase(const Ticket& ticket, QuickJS* qjs): qjs_(qjs) {
         auto& ns = qjs->ns;
         if (ns.isNull()) {
             auto md = qjs->ctx->moduleLoader(ticket.name_space.c_str());
-            ns = qjs->evalModuleNamespace(*md.source, *md.url);
+            ns = qjs->ctx->evalModuleNamespace(md.url->c_str(), md.source);
         }
         qjs::Value value = ns[ticket.name_space.c_str()];
         if (value.isFunction()) {

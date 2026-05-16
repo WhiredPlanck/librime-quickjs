@@ -18,7 +18,7 @@ QuickJS *GlobalEngine;
 
 static qjs::Value eval_file(const char* filename) {
   auto buffer = qjs::detail::readFile(filename);
-  return GlobalEngine->evalModuleNamespace(*buffer, filename);
+  return GlobalEngine->ctx->evalModuleNamespace(filename, buffer);
 }
 
 static void quickjs_initialize() {
