@@ -1,7 +1,7 @@
 #pragma once
 
 #include <quickjspp.hpp>
-#include "quickjs/quickjs-libc.h"
+#include "quickjs-libc.h"
 #include <rime/common.h>
 
 static JSContext *JS_NewCustomContext(JSRuntime *rt) {
@@ -23,8 +23,6 @@ public:
 
     QuickJS();
     ~QuickJS();
-
-    qjs::Value evalModuleNamespace(std::string_view source, std::string_view filename);
 };
 
 extern QuickJS *GlobalEngine;

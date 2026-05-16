@@ -1,6 +1,6 @@
 #pragma once
 
-#include "quickjs/quickjs.h"
+#include "quickjs.h"
 
 #include <vector>
 #include <string_view>
@@ -26,6 +26,10 @@
 #define QJSPP_TYPENAME(...) (typeid(__VA_ARGS__).name())
 #else
 #define QJSPP_TYPENAME(...) #__VA_ARGS__
+#endif
+
+#ifndef JS_BOOL
+#define JS_BOOL int
 #endif
 
 
@@ -333,7 +337,7 @@ struct js_traits<std::variant<Ts...>>
 
         if constexpr (is_vector<U>::value)
         {
-            if(JS_IsArray(ctx, v) == 1)
+            if(JS_IsArray(v) == 1)
             {
                 auto firstElement = JS_GetPropertyUint32(ctx, v, 0);
                 bool ok = isCompatible<std::decay_t<typename U::value_type>>(ctx, firstElement);
@@ -347,7 +351,7 @@ struct js_traits<std::variant<Ts...>>
 
         if constexpr (is_pair<U>::value)
         {
-            if(JS_IsArray(ctx, v) == 1)
+            if(JS_IsArray(v) == 1)
             {
                 // todo: check length?
                 auto firstElement = JS_GetPropertyUint32(ctx, v, 0);
@@ -398,7 +402,7 @@ struct js_traits<std::variant<Ts...>>
             case JS_TAG_FUNCTION_BYTECODE:
                 return std::is_function<T>::value;
             case JS_TAG_OBJECT:
-                if(JS_IsArray(ctx, v) == 1)
+                if (JS_IsArray(v) == 1)
                     return is_vector<T>::value || is_pair<T>::value;
                 if constexpr (is_shared_ptr<T>::value)
                 {
@@ -855,23 +859,26 @@ struct js_traits<std::shared_ptr<T>>
     template <typename B>
     static
     std::enable_if_t<std::is_same_v<B, T> || std::is_same_v<B, void>>
-    ensureCanCastToBase() { }
+    ensureCanCastToBase(JSContext* ctx) { }
 
     template <typename B>
     static
     std::enable_if_t<!std::is_same_v<B, T> && !std::is_same_v<B, void>>
-    ensureCanCastToBase() {
+    ensureCanCastToBase(JSContext* ctx) {
         static_assert(std::is_base_of_v<B, T>, "Type is not a derived class");
 
         if(js_traits<std::shared_ptr<T>>::QJSClassId == 0)
-            JS_NewClassID(&js_traits<std::shared_ptr<T>>::QJSClassId);
+        {
+            auto rt = JS_GetRuntime(ctx);
+            JS_NewClassID(rt, &js_traits<std::shared_ptr<T>>::QJSClassId);
+        }
 
         js_traits<std::shared_ptr<B>>::template registerDerivedClass<T>(QJSClassId, unwrap);
     }
 
     template <auto M>
-    static void ensureCanCastToBase() {
-        ensureCanCastToBase<detail::class_from_member_pointer_t<decltype(M)>>();
+    static void ensureCanCastToBase(JSContext* ctx) {
+        ensureCanCastToBase<detail::class_from_member_pointer_t<decltype(M)>>(ctx);
     }
 
     /** Stores offsets to qjs::Value members of T.
@@ -892,11 +899,11 @@ struct js_traits<std::shared_ptr<T>>
     static void register_class(JSContext * ctx, const char * name, JSValue proto = JS_NULL,
                                JSClassCall * call = nullptr, JSClassExoticMethods * exotic = nullptr)
     {
+        auto rt = JS_GetRuntime(ctx);
         if(QJSClassId == 0)
         {
-            JS_NewClassID(&QJSClassId);
+            JS_NewClassID(rt, &QJSClassId);
         }
-        auto rt = JS_GetRuntime(ctx);
         if(!JS_IsRegisteredClass(rt, QJSClassId))
         {
             JSClassGCMark * marker = nullptr;
@@ -1095,11 +1102,11 @@ struct js_traits<detail::function>
     // TODO: replace ctx with rt
     static void register_class(JSContext * ctx, const char * name)
     {
+        auto rt = JS_GetRuntime(ctx);
         if(QJSClassId == 0)
         {
-            JS_NewClassID(&QJSClassId);
+            JS_NewClassID(rt, &QJSClassId);
         }
-        auto rt = JS_GetRuntime(ctx);
         if(JS_IsRegisteredClass(rt, QJSClassId))
             return;
         JSClassDef def{
@@ -1327,14 +1334,14 @@ public:
         if(ctx) JS_FreeValue(ctx, v);
     }
 
-    bool isError() const { return JS_IsError(ctx, v); }
+    bool isError()     const noexcept { return JS_IsError(v); }
     bool isUndefined() const noexcept { return JS_IsUndefined(v); }
     bool isNull()      const noexcept { return JS_IsNull(v); }
     bool isBool()      const noexcept { return JS_IsBool(v); }
     bool isNumber()    const noexcept { return JS_IsNumber(v); }
     bool isString()    const noexcept { return JS_IsString(v); }
     bool isObject()    const noexcept { return JS_IsObject(v); }
-    bool isArray()     const noexcept { return ctx && JS_IsArray(ctx, v); }
+    bool isArray()     const noexcept { return JS_IsArray(v); }
     bool isFunction()  const noexcept { return ctx && JS_IsFunction(ctx, v); }
     bool isException() const noexcept { return JS_IsException(v); }
     bool isSymbol()    const noexcept { return JS_IsSymbol(v); }
@@ -1692,7 +1699,7 @@ public:
             template <auto F>
             class_registrar& fun(const char * name)
             {
-                js_traits<std::shared_ptr<T>>::template ensureCanCastToBase<F>();
+                js_traits<std::shared_ptr<T>>::template ensureCanCastToBase<F>(context.ctx);
                 prototype.add<F>(name);
                 return *this;
             }
@@ -1706,7 +1713,7 @@ public:
             class_registrar& static_fun(const char * name)
             {
                 assert(!JS_IsNull(ctor.v) && "You should call .constructor before .static_fun");
-                js_traits<qjs::shared_ptr<T>>::template ensureCanCastToBase<F>();
+                js_traits<qjs::shared_ptr<T>>::template ensureCanCastToBase<F>(context.ctx);
                 ctor.add<F>(name);
                 return *this;
             }
@@ -1718,8 +1725,8 @@ public:
             template <auto FGet, auto FSet = nullptr>
             class_registrar& property(const char * name)
             {
-                js_traits<std::shared_ptr<T>>::template ensureCanCastToBase<FGet>();
-                js_traits<std::shared_ptr<T>>::template ensureCanCastToBase<FSet>();
+                js_traits<std::shared_ptr<T>>::template ensureCanCastToBase<FGet>(context.ctx);
+                js_traits<std::shared_ptr<T>>::template ensureCanCastToBase<FSet>(context.ctx);
                 if constexpr (std::is_same_v<decltype(FSet), std::nullptr_t>)
                     prototype.add_getter<FGet>(name);
                 else
@@ -1750,7 +1757,7 @@ public:
             {
                 static_assert(!std::is_same_v<B, T>, "Type cannot be a base of itself");
                 assert(js_traits<std::shared_ptr<B>>::QJSClassId && "base class is not registered");
-                js_traits<std::shared_ptr<T>>::template ensureCanCastToBase<B>();
+                js_traits<std::shared_ptr<T>>::template ensureCanCastToBase<B>(context.ctx);
                 auto base_proto = JS_GetClassProto(context.ctx, js_traits<std::shared_ptr<B>>::QJSClassId);
                 int err = JS_SetPrototype(context.ctx, prototype.v, base_proto);
                 JS_FreeValue(context.ctx, base_proto);
@@ -1932,7 +1939,7 @@ public:
         // failure. Keep old compatibility API for quickjspp's eval.
         if(JS_PromiseState(ctx, v) == JS_PROMISE_REJECTED) {
             JSValue result = JS_PromiseResult(ctx, v);
-            if(JS_IsError(ctx, result)) {
+            if(JS_IsError(result)) {
                 JS_FreeValue(ctx, v);
                 v = JS_Throw(ctx, result);
             }
@@ -1951,12 +1958,37 @@ public:
         return eval(*buf, filename, flags);
     }
 
-    /// @see JS_ParseJSON2
+    Value evalModuleNamespace(const char* filename, std::optional<std::string> buffer = std::nullopt) {
+        auto buf = buffer ? std::move(buffer) : detail::readFile(filename);
+        if (!buf)
+            throw std::runtime_error{std::string{"evalFile: can't read file: "} + filename};
+        JSValue func = JS_Eval(ctx, buf->data(), buf->size(), filename,
+            JS_EVAL_TYPE_MODULE | JS_EVAL_FLAG_COMPILE_ONLY);
+        if (JS_ResolveModule(ctx, func) < 0) {
+            JS_FreeValue(ctx, func);
+            throw exception{ctx};
+        }
+
+        JSValue ret = JS_EvalFunction(ctx, JS_DupValue(ctx, func));
+        if (JS_IsException(ret)) {
+            JS_FreeValue(ctx, func);
+            JS_FreeValue(ctx, ret);
+            throw exception{ctx};
+        }
+        JS_FreeValue(ctx, ret);
+
+        JSModuleDef* m = (JSModuleDef *) JS_VALUE_GET_PTR(func);
+        JSValue ns = JS_GetModuleNamespace(ctx, m);
+        if (JS_IsException(ns)) throw exception{ctx};
+        return Value{ctx, std::move(ns)};
+    }
+
+    /// @see JS_ParseJSON
     Value fromJSON(std::string_view buffer, const char * filename = "<fromJSON>", int flags = 0)
     {
         assert(buffer.data()[buffer.size()] == '\0' &&
                "fromJSON buffer is not null-terminated"); // JS_ParseJSON requirement
-        return Value{ctx, JS_ParseJSON2(ctx, buffer.data(), buffer.size(), filename, flags)};
+        return Value{ctx, JS_ParseJSON(ctx, buffer.data(), buffer.size(), filename)};
     }
 
     /** Get qjs::Context from JSContext opaque pointer */
@@ -2120,7 +2152,7 @@ struct js_traits<std::vector<T>>
 
     static std::vector<T> unwrap(JSContext * ctx, JSValueConst jsarr)
     {
-        int e = JS_IsArray(ctx, jsarr);
+        int e = JS_IsArray(jsarr);
         if(e == 0)
             JS_ThrowTypeError(ctx, "js_traits<std::vector<T>>::unwrap expects array");
         if(e <= 0)
@@ -2166,7 +2198,7 @@ struct js_traits<std::pair<U, V>>
 
     static std::pair<U, V> unwrap(JSContext * ctx, JSValueConst jsarr)
     {
-        int e = JS_IsArray(ctx, jsarr);
+        int e = JS_IsArray(jsarr);
         if(e == 0)
             JS_ThrowTypeError(ctx, "js_traits<%s>::unwrap expects array", QJSPP_TYPENAME(std::pair<U, V>));
         if(e <= 0)
