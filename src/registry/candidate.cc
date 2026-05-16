@@ -1,9 +1,16 @@
 #include <rime/candidate.h>
+#include <rime/gear/translator_commons.h>
 
 #include "qjs_registry.h"
 
+
 namespace rime {
 namespace quickjs {
+
+template<typename X, typename Y>
+inline bool is(Y* ptr) {
+    return bool(dynamic_cast<X*>(ptr));
+}
 
 static auto getGenuineCandidate(an<Candidate> cand) {
     return Candidate::GetGenuineCandidate(cand);
@@ -21,7 +28,12 @@ void registerCandidate(Module& module) {
         .property<&Candidate::quality, &Candidate::set_quality>("quality")
         .property<&Candidate::text>("text")
         .property<&Candidate::comment>("comment")
-        .property<&Candidate::preedit>("preedit");
+        .property<&Candidate::preedit>("preedit")
+        .fun<&is<Phrase, Candidate>>("isPhrase")
+        .fun<&is<Sentence, Candidate>>("isSentence")
+        .fun<&is<SimpleCandidate, Candidate>>("isSimple")
+        .fun<&is<ShadowCandidate, Candidate>>("isShadow")
+        .fun<&is<UniquifiedCandidate, Candidate>>("isUniquified");
         // .static_fun<&getGenuineCandidate>("getGenuineCandidate")
         // .static_fun<&getGenuineCandidates>("getGenuineCandidates");
     module.class_<SimpleCandidate>("SimpleCandidate")
