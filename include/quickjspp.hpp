@@ -686,7 +686,7 @@ struct fwrapper
 
 /** Conversion to JSValue for free function in fwrapper. */
 template <typename R, typename... Args, R (* F)(Args...), bool PassThis>
-struct js_traits<fwrapper<F, PassThis>>
+struct js_traits<fwrapper<F, PassThis>, std::enable_if_t<!std::is_nothrow_invocable_r_v<R, decltype(F), Args...>>>
 {
     static JSValue wrap(JSContext * ctx, fwrapper<F, PassThis> fw) noexcept
     {
@@ -703,7 +703,7 @@ struct js_traits<fwrapper<F, PassThis>>
 
 /** Conversion to JSValue for noexcept free function in fwrapper. */
 template <typename R, typename... Args, R (* F)(Args...) noexcept, bool PassThis>
-struct js_traits<fwrapper<F, PassThis>>
+struct js_traits<fwrapper<F, PassThis>, std::enable_if_t<std::is_nothrow_invocable_r_v<R, decltype(F), Args...>>>
 {
     static JSValue wrap(JSContext * ctx, fwrapper<F, PassThis> fw) noexcept
     {
@@ -720,7 +720,7 @@ struct js_traits<fwrapper<F, PassThis>>
 
 /** Conversion to JSValue for class member function in fwrapper. PassThis is ignored and treated as true */
 template <typename R, class T, typename... Args, R (T::*F)(Args...), bool PassThis/*=ignored*/>
-struct js_traits<fwrapper<F, PassThis>>
+struct js_traits<fwrapper<F, PassThis>, std::enable_if_t<!std::is_nothrow_invocable_r_v<R, decltype(F), T&, Args...>>>
 {
     static JSValue wrap(JSContext * ctx, fwrapper<F, PassThis> fw) noexcept
     {
@@ -734,7 +734,7 @@ struct js_traits<fwrapper<F, PassThis>>
 
 /** Conversion to JSValue for noexcept class member function in fwrapper. PassThis is ignored and treated as true */
 template <typename R, class T, typename... Args, R (T::*F)(Args...) noexcept, bool PassThis/*=ignored*/>
-struct js_traits<fwrapper<F, PassThis>>
+struct js_traits<fwrapper<F, PassThis>, std::enable_if_t<std::is_nothrow_invocable_r_v<R, decltype(F), T&, Args...>>>
 {
     static JSValue wrap(JSContext * ctx, fwrapper<F, PassThis> fw) noexcept
     {
@@ -748,7 +748,7 @@ struct js_traits<fwrapper<F, PassThis>>
 
 /** Conversion to JSValue for const class member function in fwrapper. PassThis is ignored and treated as true */
 template <typename R, class T, typename... Args, R (T::*F)(Args...) const, bool PassThis/*=ignored*/>
-struct js_traits<fwrapper<F, PassThis>>
+struct js_traits<fwrapper<F, PassThis>, std::enable_if_t<!std::is_nothrow_invocable_r_v<R, decltype(F), const T&, Args...>>>
 {
     static JSValue wrap(JSContext * ctx, fwrapper<F, PassThis> fw) noexcept
     {
@@ -762,7 +762,7 @@ struct js_traits<fwrapper<F, PassThis>>
 
 /** Conversion to JSValue for const noexcept class member function in fwrapper. PassThis is ignored and treated as true */
 template <typename R, class T, typename... Args, R (T::*F)(Args...) const noexcept, bool PassThis/*=ignored*/>
-struct js_traits<fwrapper<F, PassThis>>
+struct js_traits<fwrapper<F, PassThis>, std::enable_if_t<std::is_nothrow_invocable_r_v<R, decltype(F), const T&, Args...>>>
 {
     static JSValue wrap(JSContext * ctx, fwrapper<F, PassThis> fw) noexcept
     {
