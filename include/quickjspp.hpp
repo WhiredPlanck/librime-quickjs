@@ -683,6 +683,10 @@ template <typename R, typename C, typename... Args>
 struct is_noexcept_member_function_pointer<R (C::*)(Args...) noexcept> : std::true_type {};
 template <typename R, typename C, typename... Args>
 struct is_noexcept_member_function_pointer<R (C::*)(Args...) const noexcept> : std::true_type {};
+template <typename R, typename C, typename... Args>
+struct is_noexcept_member_function_pointer<R (C::*)(Args...) volatile noexcept> : std::true_type {};
+template <typename R, typename C, typename... Args>
+struct is_noexcept_member_function_pointer<R (C::*)(Args...) const volatile noexcept> : std::true_type {};
 template <typename T>
 inline constexpr bool is_noexcept_member_function_pointer_v = is_noexcept_member_function_pointer<T>::value;
 
