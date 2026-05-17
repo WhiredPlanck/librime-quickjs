@@ -1,7 +1,0 @@
-# ninja log v7
-0	358	1778993673596371685	deps/quickjs-ng/CMakeFiles/qjs.dir/dtoa.c.o	7d42f533450d43a6
-1	632	1778993673597201866	deps/quickjs-ng/CMakeFiles/qjs.dir/libregexp.c.o	6728b72785893108
-359	903	1778993673954985874	deps/quickjs-ng/CMakeFiles/qjs.dir/libunicode.c.o	f53ad64515db70a8
-903	1828	1778993674498401640	deps/quickjs-ng/CMakeFiles/qjs.dir/quickjs-libc.c.o	32c2e93787615b31
-632	23101	1778993674227392640	deps/quickjs-ng/CMakeFiles/qjs.dir/quickjs.c.o	ff9d4c4db7507f98
-23101	27019	1778993696696047463	deps/quickjs-ng/libqjs.a	49776cef39edd2be
