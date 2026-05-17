@@ -20,6 +20,7 @@
 #include <ios>
 #include <sstream>
 #include <filesystem>
+#include <array>
 
 
 #if defined(__cpp_rtti)

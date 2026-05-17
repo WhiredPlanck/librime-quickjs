@@ -32,7 +32,7 @@ static void quickjs_initialize() {
     // 1) read directly if absolute / relative paths are used
     {
       fs::path p{name};
-      if (p.is_absolute() || (!p.empty() && (p.native().rfind("./", 0) == 0 || p.native().rfind("../", 0) == 0))) {
+      if (p.is_absolute() || p.is_relative()) {
         if (auto src = qjs::detail::readFile(p)) {
           return qjs::Context::ModuleData{ qjs::detail::toUri(p.generic_string()), std::move(*src) };
         }

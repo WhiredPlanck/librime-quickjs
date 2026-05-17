@@ -8,7 +8,7 @@ namespace rime {
 namespace quickjs {
 
 template<typename X, typename Y>
-inline bool is(Y* ptr) {
+bool is(Y* ptr) {
     return bool(dynamic_cast<X*>(ptr));
 }
 
