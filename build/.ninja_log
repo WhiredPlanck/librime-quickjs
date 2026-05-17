@@ -1,0 +1,16 @@
+# ninja log v7
+1	477	1778993569452311511	deps/quickjs-ng/CMakeFiles/qjs.dir/dtoa.c.o	7d42f533450d43a6
+2	750	1778993569453311525	deps/quickjs-ng/CMakeFiles/qjs.dir/libregexp.c.o	6728b72785893108
+478	1016	1778993569929829531	deps/quickjs-ng/CMakeFiles/qjs.dir/libunicode.c.o	f53ad64515db70a8
+1016	2067	1778993570467326652	deps/quickjs-ng/CMakeFiles/qjs.dir/quickjs-libc.c.o	32c2e93787615b31
+2067	2246	1778993571518342332	deps/quickjs-ng/CMakeFiles/qjsc.dir/qjsc.c.o	500f78af7a2d259f
+2246	2271	1778993571697345002	deps/quickjs-ng/CMakeFiles/qjs_exe.dir/gen/repl.c.o	275c80c81436770b
+2271	2282	1778993571722345375	deps/quickjs-ng/CMakeFiles/qjs_exe.dir/gen/standalone.c.o	6e673e96b4de4b2f
+2282	2445	1778993571733559470	deps/quickjs-ng/CMakeFiles/qjs_exe.dir/qjs.c.o	5f7d61e38a2992f1
+2445	3017	1778993571896347971	deps/quickjs-ng/CMakeFiles/run-test262.dir/run-test262.c.o	3370935e77a7ab68
+3017	3255	1778993572468356504	deps/quickjs-ng/CMakeFiles/api-test.dir/api-test.c.o	3fa7375984da9d7f
+3255	3279	1778993572706360054	deps/quickjs-ng/CMakeFiles/lre-test.dir/lre-test.c.o	ea3cda9d24a362a9
+3279	3906	1778993572730818301	deps/quickjs-ng/CMakeFiles/lre-test.dir/libregexp.c.o	df4c18018ff97f0d
+3906	4445	1778993573357369766	deps/quickjs-ng/CMakeFiles/lre-test.dir/libunicode.c.o	28c73e9a0934933e
+4445	4486	1778993573896378174	deps/quickjs-ng/CMakeFiles/function_source.dir/gen/function_source.c.o	755a347969fb59f5
+750	23353	1778993570201322684	deps/quickjs-ng/CMakeFiles/qjs.dir/quickjs.c.o	ff9d4c4db7507f98

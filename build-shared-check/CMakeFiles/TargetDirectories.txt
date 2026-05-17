@@ -1,0 +1,13 @@
+/home/runner/work/librime-quickjs/librime-quickjs/build-shared-check/CMakeFiles/rime-quickjs-objs.dir
+/home/runner/work/librime-quickjs/librime-quickjs/build-shared-check/CMakeFiles/edit_cache.dir
+/home/runner/work/librime-quickjs/librime-quickjs/build-shared-check/CMakeFiles/rebuild_cache.dir
+/home/runner/work/librime-quickjs/librime-quickjs/build-shared-check/deps/quickjs-ng/CMakeFiles/qjs.dir
+/home/runner/work/librime-quickjs/librime-quickjs/build-shared-check/deps/quickjs-ng/CMakeFiles/qjsc.dir
+/home/runner/work/librime-quickjs/librime-quickjs/build-shared-check/deps/quickjs-ng/CMakeFiles/qjs_exe.dir
+/home/runner/work/librime-quickjs/librime-quickjs/build-shared-check/deps/quickjs-ng/CMakeFiles/run-test262.dir
+/home/runner/work/librime-quickjs/librime-quickjs/build-shared-check/deps/quickjs-ng/CMakeFiles/api-test.dir
+/home/runner/work/librime-quickjs/librime-quickjs/build-shared-check/deps/quickjs-ng/CMakeFiles/lre-test.dir
+/home/runner/work/librime-quickjs/librime-quickjs/build-shared-check/deps/quickjs-ng/CMakeFiles/unicode_gen.dir
+/home/runner/work/librime-quickjs/librime-quickjs/build-shared-check/deps/quickjs-ng/CMakeFiles/function_source.dir
+/home/runner/work/librime-quickjs/librime-quickjs/build-shared-check/deps/quickjs-ng/CMakeFiles/edit_cache.dir
+/home/runner/work/librime-quickjs/librime-quickjs/build-shared-check/deps/quickjs-ng/CMakeFiles/rebuild_cache.dir

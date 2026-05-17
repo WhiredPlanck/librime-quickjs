@@ -7,7 +7,10 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 option(QJS_ENABLE_INSTALL "" OFF)
 option(QJS_BUILD_LIBC "" ON)
+set(_rime_quickjs_build_shared_libs ${BUILD_SHARED_LIBS})
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 add_subdirectory(deps/quickjs-ng)
+set(BUILD_SHARED_LIBS ${_rime_quickjs_build_shared_libs} CACHE BOOL "" FORCE)
 
 aux_source_directory(src quickjs_src)
 aux_source_directory(src/lib quickjs_lib)

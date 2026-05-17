@@ -701,6 +701,23 @@ struct js_traits<fwrapper<F, PassThis>>
     }
 };
 
+/** Conversion to JSValue for noexcept free function in fwrapper. */
+template <typename R, typename... Args, R (* F)(Args...) noexcept, bool PassThis>
+struct js_traits<fwrapper<F, PassThis>>
+{
+    static JSValue wrap(JSContext * ctx, fwrapper<F, PassThis> fw) noexcept
+    {
+        return JS_NewCFunction(ctx, [](JSContext * ctx, JSValueConst this_value, int argc,
+                                       JSValueConst * argv) noexcept -> JSValue {
+            if constexpr(PassThis)
+                return detail::wrap_this_call<R, Args...>(ctx, F, this_value, argc, argv);
+            else
+                return detail::wrap_call<R, Args...>(ctx, F, argc, argv);
+        }, fw.name, sizeof...(Args));
+
+    }
+};
+
 /** Conversion to JSValue for class member function in fwrapper. PassThis is ignored and treated as true */
 template <typename R, class T, typename... Args, R (T::*F)(Args...), bool PassThis/*=ignored*/>
 struct js_traits<fwrapper<F, PassThis>>
@@ -715,8 +732,36 @@ struct js_traits<fwrapper<F, PassThis>>
     }
 };
 
+/** Conversion to JSValue for noexcept class member function in fwrapper. PassThis is ignored and treated as true */
+template <typename R, class T, typename... Args, R (T::*F)(Args...) noexcept, bool PassThis/*=ignored*/>
+struct js_traits<fwrapper<F, PassThis>>
+{
+    static JSValue wrap(JSContext * ctx, fwrapper<F, PassThis> fw) noexcept
+    {
+        return JS_NewCFunction(ctx, [](JSContext * ctx, JSValueConst this_value, int argc,
+                                       JSValueConst * argv) noexcept -> JSValue {
+            return detail::wrap_this_call<R, std::shared_ptr<T>, Args...>(ctx, F, this_value, argc, argv);
+        }, fw.name, sizeof...(Args));
+
+    }
+};
+
 /** Conversion to JSValue for const class member function in fwrapper. PassThis is ignored and treated as true */
 template <typename R, class T, typename... Args, R (T::*F)(Args...) const, bool PassThis/*=ignored*/>
+struct js_traits<fwrapper<F, PassThis>>
+{
+    static JSValue wrap(JSContext * ctx, fwrapper<F, PassThis> fw) noexcept
+    {
+        return JS_NewCFunction(ctx, [](JSContext * ctx, JSValueConst this_value, int argc,
+                                       JSValueConst * argv) noexcept -> JSValue {
+            return detail::wrap_this_call<R, std::shared_ptr<T>, Args...>(ctx, F, this_value, argc, argv);
+        }, fw.name, sizeof...(Args));
+
+    }
+};
+
+/** Conversion to JSValue for const noexcept class member function in fwrapper. PassThis is ignored and treated as true */
+template <typename R, class T, typename... Args, R (T::*F)(Args...) const noexcept, bool PassThis/*=ignored*/>
 struct js_traits<fwrapper<F, PassThis>>
 {
     static JSValue wrap(JSContext * ctx, fwrapper<F, PassThis> fw) noexcept
@@ -1389,7 +1434,8 @@ public:
     // add<&f>("f");
     // add<&T::f>("f");
     template <auto F>
-    std::enable_if_t<std::is_member_function_pointer_v<decltype(F)> || std::is_function_v<std::remove_pointer_t<decltype(F)>>, Value&>
+    std::enable_if_t<std::is_member_function_pointer_v<std::decay_t<decltype(F)>> ||
+                     std::is_function_v<std::remove_pointer_t<std::decay_t<decltype(F)>>>, Value&>
     add(const char * name)
     {
         (*this)[name] = fwrapper<F, true>{name};
